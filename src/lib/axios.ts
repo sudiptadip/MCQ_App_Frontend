@@ -1,0 +1,41 @@
+import axios from 'axios';
+import { storage } from '../utils/storage';
+import { STORAGE_KEYS } from '../constants';
+
+// Create a custom axios instance
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request interceptor: Attach Auth Token if it exists
+api.interceptors.request.use(
+  (config) => {
+    const token = storage.get<string>(STORAGE_KEYS.TOKEN);
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor: Handle common errors (like 401 Unauthorized)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Logic for logout or refreshing token
+      storage.remove(STORAGE_KEYS.TOKEN);
+      storage.remove(STORAGE_KEYS.USER);
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;

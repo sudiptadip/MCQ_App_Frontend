@@ -1,0 +1,96 @@
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import AuthLayout from "../layouts/AuthLayout";
+import LoginPage from "../pages/auth/LoginPage";
+import RegisterPage from "../pages/auth/RegisterPage";
+import HomePage from "../pages/home/HomePage";
+import ProtectedRoute from "../components/auth/ProtectedRoute";
+import DashboardLayout from "../layouts/DashboardLayout";
+import PublicRoute from "../components/auth/PublicRoute";
+import FranchiseList from "../pages/franchise/FranchiseList";
+import FranchiseFormPage from "../pages/franchise/FranchiseFormPage";
+import StudentList from "../pages/student/StudentList";
+import StudentFormPage from "../pages/student/StudentFormPage";
+import MCQCategory from "../pages/category/MCQCategory";
+
+
+export const router = createBrowserRouter([
+    // Protected Routes
+    {
+        path: "/",
+        element: <ProtectedRoute />,
+        children: [
+            {
+                element: <DashboardLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <HomePage />
+                    },
+                    {
+                        path: "franchise",
+                        children: [
+                            {
+                                index: true,
+                                element: <FranchiseList />
+                            },
+                            {
+                                path: "create",
+                                element: <FranchiseFormPage />
+                            },
+                            {
+                                path: "edit/:id",
+                                element: <FranchiseFormPage />
+                            }
+                        ]
+                    },
+                    {
+                        path: "student",
+                        children: [
+                            {
+                                index: true,
+                                element: <StudentList />
+                            },
+                            {
+                                path: "create",
+                                element: <StudentFormPage />
+                            }
+                        ]
+                    },
+                    {
+                        path: "category",
+                        children: [
+                            {
+                                index: true,
+                                element: <MCQCategory />
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    // Public Auth Routes
+    {
+        element: <PublicRoute />,
+        children: [
+            {
+                element: <AuthLayout />,
+                children: [
+                    {
+                        path: "login",
+                        element: <LoginPage />
+                    },
+                    {
+                        path: "register",
+                        element: <RegisterPage />
+                    }
+                ]
+            }
+        ]
+    },
+    // Fallback redirect
+    {
+        path: "*",
+        element: <Navigate to="/" replace />
+    }
+])
