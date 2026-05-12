@@ -11,6 +11,10 @@ import FranchiseFormPage from "../pages/franchise/FranchiseFormPage";
 import StudentList from "../pages/student/StudentList";
 import StudentFormPage from "../pages/student/StudentFormPage";
 import MCQCategory from "../pages/category/MCQCategory";
+import McqQuestionAnsListPage from "../pages/mcq/McqQuestionAnsListPage";
+import UpsertMcqQuestionAnsPage from "../pages/mcq/UpsertMcqQuestionAnsPage";
+import TestListPage from "../pages/test/TestListPage";
+import UpsertTestPage from "../pages/test/UpsertTestPage";
 
 
 export const router = createBrowserRouter([
@@ -62,6 +66,40 @@ export const router = createBrowserRouter([
                             {
                                 index: true,
                                 element: <MCQCategory />
+                            }
+                        ]
+                    },
+                    {
+                        path: "question-ans",
+                        children: [
+                            {
+                                index: true,
+                                element: <McqQuestionAnsListPage />
+                            },
+                            {
+                                path: "create",
+                                element: <UpsertMcqQuestionAnsPage />
+                            },
+                            {
+                                path: "edit/:id",
+                                element: <UpsertMcqQuestionAnsPage />
+                            }
+                        ]
+                    },
+                    {
+                        path: "test",
+                        children: [
+                            {
+                                index: true,
+                                element: <TestListPage />
+                            },
+                            {
+                                path: "create",
+                                element: <UpsertTestPage />
+                            },
+                            {
+                                path: "edit/:id",
+                                element: <UpsertTestPage />
                             }
                         ]
                     }

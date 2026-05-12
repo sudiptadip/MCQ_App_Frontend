@@ -4,7 +4,6 @@ import { STORAGE_KEYS } from "../../constants";
 
 const PublicRoute = () => {
   const token = storage.get<string>(STORAGE_KEYS.TOKEN);
-  debugger;
   if (token) {
     return <Navigate to="/" replace />;
   }

@@ -21,3 +21,19 @@ export const deleteCategory = async (id: number): Promise<apiResponse<string>> =
   const response = await api.post(API_ROUTES.DELETE_CATEGORY, { id: id });
   return response.data;
 };
+
+export const getParentCategories = async (): Promise<Category[]> => {
+  const response = await api.post(API_ROUTES.GET_PARENT_CATEGORY_LIST, {});
+  if (response.data.isSuccess) {
+    return (response.data?.data || []) as Category[];
+  }
+  throw new Error(response.data.message || "Failed to fetch parent categories");
+};
+
+export const getCategoriesByParentId = async (categoryId: number): Promise<Category[]> => {
+  const response = await api.post(API_ROUTES.GET_CATEGORY_PARENT_CHILD_BY_ID, { id: categoryId });
+  if (response.data.isSuccess) {
+    return (response.data?.data || []) as Category[];
+  }
+  throw new Error(response.data.message || "Failed to fetch child categories");
+};
