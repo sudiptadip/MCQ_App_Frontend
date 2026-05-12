@@ -6,6 +6,7 @@ import {
   ContactRound,
   ListChevronsDownUp,
   ClipboardCheck,
+  Monitor,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -17,6 +18,7 @@ export const navItems = [
   { icon: <ListChevronsDownUp size={20} />, label: "Category", path: "/category" },
   { icon: <BookOpen size={20} />, label: "Questions & Answers", path: "/question-ans" },
   { icon: <ClipboardCheck size={20} />, label: "Tests", path: "/test" },
+  { icon: <Monitor size={20} />, label: "Display Views", path: "/display-view" },
   { icon: <Settings size={20} />, label: "Settings", path: "/settings" },
 ];
 

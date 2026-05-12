@@ -5,4 +5,6 @@ export const SP_NAME = {
     SP_QUESTION_ANS: "SpQuestionAns",
     SP_TEST: "SpTest",
     SP_TEST_QUESTIONS: "SpTestQuestions",
+    SP_DISPLAY_VIEW: "SpDisplayView",
+    SP_DISPLAY_VIEW_TEST: "SpDisplayViewTest",
 };

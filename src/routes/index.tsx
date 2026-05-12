@@ -15,6 +15,8 @@ import McqQuestionAnsListPage from "../pages/mcq/McqQuestionAnsListPage";
 import UpsertMcqQuestionAnsPage from "../pages/mcq/UpsertMcqQuestionAnsPage";
 import TestListPage from "../pages/test/TestListPage";
 import UpsertTestPage from "../pages/test/UpsertTestPage";
+import DisplayViewListPage from "../pages/display-view/DisplayViewListPage";
+import UpsertDisplayViewPage from "../pages/display-view/UpsertDisplayViewPage";
 
 
 export const router = createBrowserRouter([
@@ -100,6 +102,23 @@ export const router = createBrowserRouter([
                             {
                                 path: "edit/:id",
                                 element: <UpsertTestPage />
+                            }
+                        ]
+                    },
+                    {
+                        path: "display-view",
+                        children: [
+                            {
+                                index: true,
+                                element: <DisplayViewListPage />
+                            },
+                            {
+                                path: "create",
+                                element: <UpsertDisplayViewPage />
+                            },
+                            {
+                                path: "edit/:id",
+                                element: <UpsertDisplayViewPage />
                             }
                         ]
                     }
