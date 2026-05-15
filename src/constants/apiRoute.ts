@@ -40,4 +40,13 @@ export const API_ROUTES = {
   UPSERT_DISPLAY_VIEW_TEST: `/${AUTH_ENDPOINT.ADMIN_AND_FRANCHISE}/${SP_NAME.SP_DISPLAY_VIEW_TEST}/1`,
   DELETE_DISPLAY_VIEW_TEST: `/${AUTH_ENDPOINT.ADMIN_AND_FRANCHISE}/${SP_NAME.SP_DISPLAY_VIEW_TEST}/2`,
   GET_DISPLAY_VIEW_TESTS: `/${AUTH_ENDPOINT.ADMIN_AND_FRANCHISE}/${SP_NAME.SP_DISPLAY_VIEW_TEST}/3`,
+
+  // Practice Attempts — accessible by all authenticated users
+  // Backend SP: SpAttempt
+  // Payload for START_ATTEMPT:   { test_id: number }
+  // Returns:                     { id, student_id, test_id, score, started_at }
+  // Payload for SUBMIT_ATTEMPT:  { attempt_id: number, answers: [{ question_id, selected_option_id }] }
+  // Returns:                     { attempt_id, score, total_questions, correct_answers }
+  START_ATTEMPT: `/${AUTH_ENDPOINT.ALL}/${SP_NAME.SP_ATTEMPT}/1`,
+  SUBMIT_ATTEMPT: `/${AUTH_ENDPOINT.ALL}/${SP_NAME.SP_ATTEMPT}/2`,
 };

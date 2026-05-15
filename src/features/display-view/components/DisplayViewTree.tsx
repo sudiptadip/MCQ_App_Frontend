@@ -158,32 +158,43 @@ const DisplayViewTree: React.FC<DisplayViewTreeProps> = ({
               onClick={(e) => { e.stopPropagation(); if (hasChildren) node.toggle(); }}
             >
               {isTest ? (
-                <ClipboardList className="h-3.5 w-3.5 shrink-0 text-indigo-500" />
+                <div className="h-4 w-4 shrink-0 flex items-center justify-center bg-indigo-500/10 rounded-md">
+                  <ClipboardList className="h-3 w-3 text-indigo-500" />
+                </div>
               ) : isRoot ? (
-                <Monitor className="h-4 w-4 shrink-0 text-primary" />
+                <div className="h-5 w-5 shrink-0 flex items-center justify-center bg-primary/10 rounded-lg">
+                  <Monitor className="h-3.5 w-3.5 text-primary" />
+                </div>
               ) : (
-                <Folder className={cn('h-4 w-4 shrink-0', node.level === 1 ? 'text-indigo-400' : 'text-amber-400')} />
+                <div className={cn(
+                  "h-4 w-4 shrink-0 flex items-center justify-center rounded-md",
+                  node.level === 1 ? 'bg-indigo-500/10' : 'bg-amber-500/10'
+                )}>
+                  <Folder className={cn('h-3 w-3', node.level === 1 ? 'text-indigo-500' : 'text-amber-500')} />
+                </div>
               )}
               <span className={cn(
-                "text-sm truncate",
-                isTest ? "font-normal text-indigo-700 italic" : "font-medium"
+                "text-sm truncate transition-colors",
+                isTest ? "font-medium text-indigo-700/80 italic" : "font-semibold text-foreground/80 group-hover:text-foreground"
               )}>
                 {node.data.name}
               </span>
-              <span className="text-[10px] uppercase text-muted-foreground/50 tracking-wider shrink-0 ml-1">
-                {isTest ? 'test' : isRoot ? 'root' : 'child'}
-              </span>
+              {isRoot && (
+                <span className="text-[9px] font-bold uppercase bg-primary/5 text-primary/60 px-1.5 py-0.5 rounded-full border border-primary/10 tracking-tight shrink-0 ml-1">
+                  Root
+                </span>
+              )}
             </div>
 
             {/* Actions */}
-              <div className="hidden group-hover:flex items-center gap-0.5 ml-auto shrink-0 animate-in fade-in duration-150">
+              <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 ml-auto shrink-0 transition-all duration-300 translate-x-2 group-hover:translate-x-0 pr-1">
                 {!isTest && (
                   <>
                     <Button
                       variant="ghost"
                       size="icon"
                       title="Add child"
-                      className="h-7 w-7 text-primary hover:bg-primary/10"
+                      className="h-7 w-7 rounded-full text-primary hover:bg-primary/10 hover:scale-110 transition-all"
                       onClick={(e) => { e.stopPropagation(); onAdd(asDisplayView); }}
                     >
                       <Plus className="h-3.5 w-3.5" />
@@ -192,7 +203,7 @@ const DisplayViewTree: React.FC<DisplayViewTreeProps> = ({
                       variant="ghost"
                       size="icon"
                       title="Assign MCQ Test"
-                      className="h-7 w-7 text-indigo-500 hover:bg-indigo-500/10"
+                      className="h-7 w-7 rounded-full text-indigo-500 hover:bg-indigo-500/10 hover:scale-110 transition-all"
                       onClick={(e) => { e.stopPropagation(); onAssign(asDisplayView); }}
                     >
                       <ClipboardList className="h-3.5 w-3.5" />
@@ -201,7 +212,7 @@ const DisplayViewTree: React.FC<DisplayViewTreeProps> = ({
                       variant="ghost"
                       size="icon"
                       title="Edit"
-                      className="h-7 w-7 hover:bg-accent"
+                      className="h-7 w-7 rounded-full text-foreground/60 hover:text-foreground hover:bg-accent hover:scale-110 transition-all"
                       onClick={(e) => { e.stopPropagation(); onEdit(asDisplayView); }}
                     >
                       <Pencil className="h-3.5 w-3.5" />
@@ -210,7 +221,7 @@ const DisplayViewTree: React.FC<DisplayViewTreeProps> = ({
                       variant="ghost"
                       size="icon"
                       title="Delete"
-                      className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                      className="h-7 w-7 rounded-full text-destructive hover:bg-destructive/10 hover:scale-110 transition-all"
                       onClick={(e) => { e.stopPropagation(); onDelete(node.data._id); }}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -222,7 +233,7 @@ const DisplayViewTree: React.FC<DisplayViewTreeProps> = ({
                     variant="ghost"
                     size="icon"
                     title="Unassign Test"
-                    className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                    className="h-7 w-7 rounded-full text-destructive hover:bg-destructive/10 hover:scale-110 transition-all"
                     onClick={(e) => { 
                       e.stopPropagation(); 
                       if (node.data.test_info) onUnassign(node.data.test_info.assignment_id); 
@@ -239,57 +250,68 @@ const DisplayViewTree: React.FC<DisplayViewTreeProps> = ({
     [onAdd, onEdit, onDelete, onAssign, onUnassign]
   );
 
-
   return (
-    <div className="h-full flex flex-col border rounded-xl bg-card shadow-sm overflow-hidden border-primary/10">
+    <div className="h-full flex flex-col border-0 lg:border border-primary/5 lg:rounded-3xl bg-card/30 backdrop-blur-md shadow-2xl shadow-primary/5 overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b flex items-center justify-between bg-muted/20 backdrop-blur-sm shrink-0">
+      <div className="p-5 border-b border-primary/5 flex items-center justify-between bg-gradient-to-r from-muted/30 to-transparent shrink-0">
         <div>
-          <h3 className="font-bold text-base tracking-tight">Display View Structure</h3>
-          <p className="text-[11px] text-muted-foreground uppercase font-semibold tracking-wide">
-            Drag &amp; Drop to Reorganize
+          <h3 className="font-extrabold text-lg tracking-tight text-foreground/90 flex items-center gap-2">
+            <Layers className="h-5 w-5 text-primary" />
+            Structure
+          </h3>
+          <p className="text-[10px] text-muted-foreground/60 uppercase font-bold tracking-widest mt-0.5">
+            Interactive Node Tree
           </p>
         </div>
         {!disableAddRoot && (
-          <Button size="sm" onClick={onAddRoot} className="h-8 gap-1.5 shadow-sm">
-            <Plus className="h-3.5 w-3.5" />
+          <Button size="sm" onClick={onAddRoot} className="h-9 px-4 gap-2 shadow-lg shadow-primary/20 rounded-xl transition-transform active:scale-95">
+            <Plus className="h-4 w-4" />
             Add Root
           </Button>
         )}
-        {disableAddRoot && (
-          <span className="text-xs text-muted-foreground italic px-2">
-            Navigate away to add another root
-          </span>
-        )}
       </div>
 
-      {/* Tree */}
-      <div className="flex-1 overflow-hidden">
+      {/* Tree Content */}
+      <div className="flex-1 overflow-hidden p-2">
         {treeData.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-muted-foreground bg-accent/5 rounded-lg border-2 border-dashed border-muted m-4">
-            <Layers className="h-10 w-10 mb-2 opacity-20" />
-            <p className="italic text-sm mb-1">No display views defined yet.</p>
+          <div className="h-full flex flex-col items-center justify-center text-muted-foreground m-4 rounded-2xl border border-dashed border-primary/10 bg-primary/5">
+            <div className="bg-primary/5 p-4 rounded-full mb-3 shadow-inner">
+              <Layers className="h-10 w-10 opacity-30" />
+            </div>
+            <p className="font-semibold text-sm mb-1 text-foreground/60">No structure defined</p>
+            <p className="text-xs opacity-50 mb-4 text-center px-6">Start by creating your first root node to organize your content.</p>
             {!disableAddRoot && (
-              <Button variant="link" size="sm" onClick={onAddRoot}>
-                Create your first root
+              <Button variant="outline" size="sm" onClick={onAddRoot} className="rounded-lg h-8 border-primary/20 hover:bg-primary/5 text-primary">
+                Create First Root
               </Button>
             )}
           </div>
         ) : (
-          <Tree<TreeNode>
-            ref={treeRef}
-            data={treeData}
-            width="100%"
-            height={600}
-            indent={20}
-            rowHeight={40}
-            overscanCount={5}
-            onMove={handleMove}
-            openByDefault={true}
-          >
-            {NodeRenderer}
-          </Tree>
+          <div className="h-full">
+            <Tree<TreeNode>
+              ref={treeRef}
+              data={treeData}
+              width="100%"
+              height={600}
+              indent={24}
+              rowHeight={44}
+              overscanCount={8}
+              onMove={handleMove}
+              openByDefault={true}
+              className="scrollbar-hide"
+            >
+              {NodeRenderer}
+            </Tree>
+          </div>
         )}
+      </div>
+
+      {/* Footer Info */}
+      <div className="px-5 py-3 border-t border-primary/5 bg-muted/20 flex items-center gap-2">
+        <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+        <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-tighter">
+          Drag items to reorganize
+        </span>
       </div>
     </div>
   );

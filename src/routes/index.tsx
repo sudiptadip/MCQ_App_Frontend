@@ -17,6 +17,10 @@ import TestListPage from "../pages/test/TestListPage";
 import UpsertTestPage from "../pages/test/UpsertTestPage";
 import DisplayViewListPage from "../pages/display-view/DisplayViewListPage";
 import UpsertDisplayViewPage from "../pages/display-view/UpsertDisplayViewPage";
+import PracticeHomePage from "../pages/practice/PracticeHomePage";
+import PracticeBrowsePage from "../pages/practice/PracticeBrowsePage";
+import PracticeTestPage from "../pages/practice/PracticeTestPage";
+import PracticeResultPage from "../pages/practice/PracticeResultPage";
 
 
 export const router = createBrowserRouter([
@@ -119,6 +123,27 @@ export const router = createBrowserRouter([
                             {
                                 path: "edit/:id",
                                 element: <UpsertDisplayViewPage />
+                            }
+                        ]
+                    },
+                    {
+                        path: "practice",
+                        children: [
+                            {
+                                index: true,
+                                element: <PracticeHomePage />
+                            },
+                            {
+                                path: ":nodeId",
+                                element: <PracticeBrowsePage />
+                            },
+                            {
+                                path: "test/:testId",
+                                element: <PracticeTestPage />
+                            },
+                            {
+                                path: "result/:testId",
+                                element: <PracticeResultPage />
                             }
                         ]
                     }
