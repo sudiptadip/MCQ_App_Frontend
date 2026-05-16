@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Folder, ChevronRight, BookOpen, Layers, GraduationCap } from 'lucide-react';
+import { Folder, ChevronRight, BookOpen, Layers, GraduationCap, History } from 'lucide-react';
 import { getDisplayViews } from '../../features/display-view/api/displayView.api';
 import Loading from '../../components/common/Loading';
 import Error from '../../components/common/Error';
@@ -36,9 +36,18 @@ const PracticeHomePage: React.FC = () => {
             <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-1">
               Practice Hub
             </h1>
-            <p className="text-indigo-200 text-base font-medium">
-              Choose a subject to begin your practice session
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+               <p className="text-indigo-200 text-base font-medium">
+                Choose a subject to begin your practice session
+              </p>
+              <div className="hidden sm:block h-1 w-1 rounded-full bg-indigo-300/30" />
+              <button 
+                onClick={() => navigate('/practice/history')}
+                className="flex items-center gap-1.5 text-white/90 hover:text-white font-bold text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded-lg transition-all"
+              >
+                <History size={16} /> View History
+              </button>
+            </div>
           </div>
         </div>
         <div className="absolute top-4 right-8 opacity-20">

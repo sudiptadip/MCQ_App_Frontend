@@ -44,3 +44,41 @@ export interface AttemptResult {
   total_questions: number;
   correct_answers: number;
 }
+
+// ── Attempt History ──────────────────────────────────────────────────────────
+export interface AttemptHistoryItem {
+  attemptId: number;
+  testId: number;
+  testName: string;
+  categoryName: string;
+  attemptDate: string;
+  score: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  percentage: number;
+  status: 'Pending' | 'Completed';
+}
+
+// ── Attempt Review ──────────────────────────────────────────────────────────
+export interface ReviewOption {
+  id: number;
+  optionText: string;
+  isCorrect: boolean;
+}
+
+export interface ReviewQuestion {
+  id: number;
+  questionText: string;
+  difficultyLevel: string;
+  userSelectedOptionId: number | null;
+  options: ReviewOption[];
+}
+
+export interface AttemptReview {
+  attemptId: number;
+  testName: string;
+  totalQuestions: number;
+  correctAnswers: number;
+  score: number;
+  questions: ReviewQuestion[];
+}

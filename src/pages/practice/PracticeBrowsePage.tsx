@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { 
-  Folder, 
-  ChevronRight, 
-  ClipboardList, 
-  ArrowLeft, 
+import {
+  Folder,
+  ChevronRight,
+  ClipboardList,
+  ArrowLeft,
   Home,
   Play,
   Clock,
@@ -24,6 +24,14 @@ interface BreadcrumbItem {
   name: string;
 }
 
+interface AttemptTest {
+  id: number;
+  test_id: number;
+  test_name: string;
+  duration_minutes: number;
+  total_questions: number;
+}
+
 const PracticeBrowsePage: React.FC = () => {
   const { nodeId } = useParams<{ nodeId: string }>();
   const navigate = useNavigate();
@@ -40,25 +48,25 @@ const PracticeBrowsePage: React.FC = () => {
   const { children, currentNode, tests } = useMemo(() => {
     const currentNode = allNodes.find(n => n.id === currentNodeId);
     const children = allNodes.filter(n => n.parent_id === currentNodeId);
-    
+
     // Parse assigned tests if present on current node
-    let tests: any[] = [];
+    let tests: AttemptTest[] = [];
     if (currentNode?.assigned_tests) {
       try {
-        tests = typeof currentNode.assigned_tests === 'string' 
-          ? JSON.parse(currentNode.assigned_tests) 
+        tests = typeof currentNode.assigned_tests === 'string'
+          ? JSON.parse(currentNode.assigned_tests)
           : currentNode.assigned_tests;
       } catch (e) {
         tests = [];
       }
     }
-    
+
     return { children, currentNode, tests };
   }, [allNodes, currentNodeId]);
 
   // Breadcrumb logic
   const breadcrumbs = (location.state?.breadcrumb || []) as BreadcrumbItem[];
-  
+
   const handleFolderClick = (child: any) => {
     const newBreadcrumb = [...breadcrumbs, { id: child.id, name: child.display_name }];
     navigate(`/practice/${child.id}`, { state: { breadcrumb: newBreadcrumb } });
@@ -76,9 +84,9 @@ const PracticeBrowsePage: React.FC = () => {
     <div className="container mx-auto p-4 space-y-8 animate-in fade-in duration-500">
       {/* Breadcrumbs & Back Button */}
       <div className="flex flex-col gap-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => navigate(-1)}
           className="w-fit flex items-center gap-2 text-muted-foreground hover:text-foreground"
         >
@@ -86,7 +94,7 @@ const PracticeBrowsePage: React.FC = () => {
         </Button>
 
         <nav className="flex items-center gap-2 text-sm font-medium">
-          <button 
+          <button
             onClick={() => navigate('/practice')}
             className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
           >
@@ -98,8 +106,8 @@ const PracticeBrowsePage: React.FC = () => {
               <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50" />
               <button
                 onClick={() => {
-                    const truncatedBreadcrumb = breadcrumbs.slice(0, idx + 1);
-                    navigate(`/practice/${item.id}`, { state: { breadcrumb: truncatedBreadcrumb } });
+                  const truncatedBreadcrumb = breadcrumbs.slice(0, idx + 1);
+                  navigate(`/practice/${item.id}`, { state: { breadcrumb: truncatedBreadcrumb } });
                 }}
                 disabled={idx === breadcrumbs.length - 1}
                 className={`transition-colors ${idx === breadcrumbs.length - 1 ? 'text-foreground font-bold cursor-default' : 'text-muted-foreground hover:text-primary'}`}
@@ -174,18 +182,18 @@ const PracticeBrowsePage: React.FC = () => {
                         <Hash className="h-3.5 w-3.5" />
                         <span className="text-[10px] font-bold uppercase tracking-tighter">Questions</span>
                       </div>
-                      <span className="text-sm font-black">5 Qs</span>
+                      <span className="text-sm font-black">{test.total_questions} Qs</span>
                     </div>
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-1.5 text-muted-foreground">
                         <Clock className="h-3.5 w-3.5" />
                         <span className="text-[10px] font-bold uppercase tracking-tighter">Duration</span>
                       </div>
-                      <span className="text-sm font-black">30 Min</span>
+                      <span className="text-sm font-black">{test.duration_minutes} Min</span>
                     </div>
                   </div>
-                  
-                  <Button 
+
+                  <Button
                     className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl h-11 gap-2 shadow-lg shadow-indigo-500/25 transition-transform active:scale-95"
                     onClick={() => navigate(`/practice/test/${test.test_id}`)}
                   >

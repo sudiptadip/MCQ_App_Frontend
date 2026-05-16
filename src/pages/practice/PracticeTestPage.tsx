@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import {
-  Clock,
   ChevronLeft,
   ChevronRight,
   Flag,
@@ -12,7 +11,8 @@ import {
   AlertCircle,
   HelpCircle,
   Hash,
-  Timer
+  Timer,
+  Target
 } from 'lucide-react';
 import { fetchTestWithQuestions, startAttempt, submitAttempt } from '../../features/practice/api/practice.api';
 import { practiceSession } from '../../utils/practiceSession';
@@ -26,14 +26,199 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { showToast } from '../../utils/toast';
 import type { PracticeQuestion, PracticeSession as SessionType } from '../../types/practice';
 
+// ── Memoized Components ──────────────────────────────────────────────────────
+
+interface TestTimerProps {
+  initialSeconds: number;
+  onTimeUp: () => void;
+}
+
+const TestTimer: React.FC<TestTimerProps> = React.memo(({ initialSeconds, onTimeUp }) => {
+  const [timeLeft, setTimeLeft] = useState(initialSeconds);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      onTimeUp();
+      return;
+    }
+    const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+    return () => clearInterval(timer);
+  }, [timeLeft, onTimeUp]);
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const isLowTime = timeLeft < 300;
+
+  return (
+    <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full border transition-all duration-500 ${isLowTime ? 'bg-red-50 border-red-200 text-red-600 animate-pulse' : 'bg-slate-50 border-slate-200 text-slate-700'}`}>
+      <Timer size={16} className={isLowTime ? 'animate-bounce' : ''} />
+      <span className="text-sm font-bold tabular-nums">{formatTime(timeLeft)}</span>
+    </div>
+  );
+});
+
+interface QuestionCardProps {
+  question: PracticeQuestion;
+  index: number;
+  isSelected: (optionId: number) => boolean;
+  isFlagged: boolean;
+  onSelectOption: (questionId: number, optionId: number) => void;
+  onToggleFlag: (questionId: number) => void;
+  onReset: (questionId: number) => void;
+}
+
+const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
+  question,
+  index,
+  isSelected,
+  isFlagged,
+  onSelectOption,
+  onToggleFlag,
+  onReset
+}) => (
+  <Card className="border-0 shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white/50 backdrop-blur-sm flex flex-col h-full">
+    <CardHeader className="p-4 md:p-6 border-b border-slate-100 bg-slate-50/30 shrink-0">
+      <div className="flex justify-between items-start gap-4">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Badge className="bg-indigo-600 text-white px-3 py-0.5 rounded-full text-[10px] font-bold tracking-tight">QUESTION {index + 1}</Badge>
+            {question.difficulty_level && (
+              <Badge variant="outline" className="text-[10px] font-semibold border-slate-200 text-slate-500">{question.difficulty_level}</Badge>
+            )}
+          </div>
+          <CardTitle className="text-lg md:text-xl font-bold text-slate-800 leading-tight">
+            {question.question_text}
+          </CardTitle>
+        </div>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onToggleFlag(question.id)}
+            className={`rounded-full transition-all duration-300 ${isFlagged ? 'text-amber-500 bg-amber-50/80 shadow-inner' : 'text-slate-400 hover:bg-slate-100'}`}
+          >
+            <Flag size={20} fill={isFlagged ? "currentColor" : "none"} />
+          </Button>
+        </div>
+      </div>
+    </CardHeader>
+    <CardContent className="p-6 md:p-8 space-y-6">
+      <div className="grid grid-cols-1 gap-3">
+        {question.options.map((option, idx) => {
+          const selected = isSelected(option.id);
+          return (
+            <button
+              key={option.id}
+              onClick={() => onSelectOption(question.id, option.id)}
+              className={`flex items-center gap-4 p-3 md:p-4 rounded-xl border transition-all duration-300 group text-left ${selected
+                ? 'border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600/20'
+                : 'border-slate-100 bg-white hover:border-indigo-200 hover:bg-slate-50/50'
+                }`}
+            >
+              <div className={`h-7 w-7 shrink-0 rounded-lg border flex items-center justify-center font-bold text-xs transition-all duration-300 ${selected
+                ? 'bg-indigo-600 border-indigo-600 text-white'
+                : 'border-slate-200 text-slate-400 group-hover:border-indigo-300 group-hover:text-indigo-600 bg-slate-50'
+                }`}>
+                {String.fromCharCode(65 + idx)}
+              </div>
+              <span className={`flex-1 text-sm md:text-base font-medium transition-colors ${selected ? 'text-indigo-900 font-bold' : 'text-slate-600'}`}>
+                {option.option_text}
+              </span>
+              {selected && (
+                <div className="h-5 w-5 rounded-full bg-indigo-600 flex items-center justify-center animate-in zoom-in-50 duration-300">
+                  <CheckCircle2 className="h-3 w-3 text-white" />
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="flex justify-end pt-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onReset(question.id)}
+          className="text-slate-400 hover:text-red-500 hover:bg-red-50 font-bold text-[10px] uppercase tracking-widest gap-2 rounded-lg"
+        >
+          <X size={14} /> Clear Selection
+        </Button>
+      </div>
+    </CardContent>
+  </Card>
+));
+
+interface NavigatorProps {
+  questions: PracticeQuestion[];
+  currentIdx: number;
+  answers: Record<number, number>;
+  flagged: number[];
+  onNavigate: (idx: number) => void;
+}
+
+const QuestionNavigator: React.FC<NavigatorProps> = React.memo(({
+  questions,
+  currentIdx,
+  answers,
+  flagged,
+  onNavigate
+}) => (
+  <Card className="border-0 shadow-lg shadow-slate-200/40 rounded-3xl bg-white overflow-hidden">
+    <CardHeader className="p-5 border-b border-slate-50 bg-slate-50/50">
+      <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+        <Hash size={14} className="text-indigo-500" /> QUESTION NAVIGATOR
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="p-5">
+      <div className="grid grid-cols-5 sm:grid-cols-6 lg:grid-cols-5 gap-2">
+        {questions.map((q, idx) => {
+          const isAnswered = answers[q.id] !== undefined;
+          const isFlagged = flagged.includes(q.id);
+          const isCurrent = currentIdx === idx;
+
+          return (
+            <button
+              key={q.id}
+              onClick={() => onNavigate(idx)}
+              className={`h-9 rounded-xl font-bold text-xs transition-all duration-300 relative ${isCurrent
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 scale-105 z-10'
+                : isAnswered
+                  ? 'bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100'
+                  : 'bg-slate-50 text-slate-400 border border-slate-100 hover:border-indigo-200 hover:text-indigo-600'
+                }`}
+            >
+              {idx + 1}
+              {isFlagged && (
+                <div className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-amber-500 rounded-full border border-white" />
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <div className="mt-6 pt-4 border-t border-slate-100 space-y-2">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-tight text-slate-400">
+          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-full bg-indigo-600" /> Current</div>
+          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-full bg-emerald-500" /> Answered</div>
+          <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-full bg-amber-500" /> Flagged</div>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+));
+
 const PracticeTestPage: React.FC = () => {
   const { testId } = useParams<{ testId: string }>();
   const navigate = useNavigate();
   const testIdNum = Number(testId);
 
   // ── States ──────────────────────────────────────────────────────────────────
+  // ── States ──────────────────────────────────────────────────────────────────
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [initialTimeLeft, setInitialTimeLeft] = useState<number | null>(null);
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
   const [session, setSession] = useState<SessionType | null>(null);
   const [localAnswers, setLocalAnswers] = useState<Record<number, number>>({});
@@ -46,9 +231,10 @@ const PracticeTestPage: React.FC = () => {
     enabled: !!testIdNum,
   });
 
+
   // ── Session Initialization ──────────────────────────────────────────────────
   useEffect(() => {
-    if (!testData) return;
+    if (!testData || session) return;
 
     let existingSession = practiceSession.get(testIdNum);
 
@@ -61,7 +247,7 @@ const PracticeTestPage: React.FC = () => {
       const startTime = new Date(existingSession.startedAt).getTime();
       const endTime = startTime + (existingSession.durationMinutes * 60 * 1000);
       const remainingSeconds = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
-      setTimeLeft(remainingSeconds);
+      setInitialTimeLeft(remainingSeconds);
     } else {
       // Create new session
       const newSession = practiceSession.create(
@@ -71,12 +257,12 @@ const PracticeTestPage: React.FC = () => {
         testData.durationMinutes
       );
       setSession(newSession);
-      setTimeLeft(testData.durationMinutes * 60);
+      setInitialTimeLeft(testData.durationMinutes * 60);
 
       // Start backend attempt
       startAttemptMutation.mutate(testIdNum);
     }
-  }, [testData, testIdNum]);
+  }, [testData, testIdNum, session]);
 
   // ── Mutations ───────────────────────────────────────────────────────────────
   const startAttemptMutation = useMutation({
@@ -95,7 +281,13 @@ const PracticeTestPage: React.FC = () => {
       if (res.isSuccess) {
         practiceSession.complete(testIdNum);
         showToast.success('Test submitted successfully!');
-        navigate(`/practice/result/${testIdNum}`, { state: { result: res.data } });
+        navigate(`/practice/result/${testIdNum}`, { 
+          state: { 
+            result: res.data,
+            questions: testData?.questions || [],
+            answers: localAnswers
+          } 
+        });
         practiceSession.clear(testIdNum);
       } else {
         showToast.error(res.message || 'Submission failed');
@@ -104,39 +296,39 @@ const PracticeTestPage: React.FC = () => {
     onError: (err) => showToast.apiErrorShow(err)
   });
 
-  // ── Timer Logic ─────────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (timeLeft === null || timeLeft <= 0) {
-      if (timeLeft === 0) handleAutoSubmit();
-      return;
-    }
-
-    const timer = setInterval(() => {
-      setTimeLeft(prev => (prev !== null ? prev - 1 : null));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [timeLeft]);
-
   // ── Handlers ───────────────────────────────────────────────────────────────
-  const handleSelectOption = (questionId: number, optionId: number) => {
+  const handleSelectOption = useCallback((questionId: number, optionId: number) => {
     setLocalAnswers(prev => ({ ...prev, [questionId]: optionId }));
     practiceSession.setAnswer(testIdNum, questionId, optionId);
-  };
+  }, [testIdNum]);
 
-  const handleToggleFlag = (questionId: number) => {
+  const handleToggleFlag = useCallback((questionId: number) => {
     setFlaggedQuestions(prev => {
       const isFlagged = prev.includes(questionId);
       const newFlags = isFlagged ? prev.filter(id => id !== questionId) : [...prev, questionId];
       return newFlags;
     });
     practiceSession.toggleFlag(testIdNum, questionId);
-  };
+  }, [testIdNum]);
 
-  const handleAutoSubmit = () => {
+  const handleResetAnswer = useCallback((questionId: number) => {
+    setLocalAnswers(prev => {
+      const newAnswers = { ...prev };
+      delete newAnswers[questionId];
+      return newAnswers;
+    });
+    // Update local storage too
+    const currentSession = practiceSession.get(testIdNum);
+    if (currentSession) {
+      delete currentSession.answers[questionId];
+      practiceSession.save(currentSession);
+    }
+  }, [testIdNum]);
+
+  const handleAutoSubmit = useCallback(() => {
     showToast.warning("Time's up! Submitting your test automatically.");
     handleSubmit();
-  };
+  }, [session?.attemptId, localAnswers]); // Needs latest values for submission
 
   const handleSubmit = () => {
     if (!session?.attemptId) {
@@ -155,14 +347,6 @@ const PracticeTestPage: React.FC = () => {
     });
   };
 
-  // ── Formatting ──────────────────────────────────────────────────────────────
-  const formatTime = (seconds: number) => {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    return `${h > 0 ? h + ':' : ''}${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  };
-
   // ── Computed ───────────────────────────────────────────────────────────────
   const currentQuestion = testData?.questions[currentQuestionIndex];
   const progress = ((Object.keys(localAnswers).length) / (testData?.totalQuestions || 1)) * 100;
@@ -172,200 +356,113 @@ const PracticeTestPage: React.FC = () => {
   if (isError) return <div className="p-12"><Error title="Load Error" message="Could not start the test. Please try again." onRetry={() => navigate(-1)} /></div>;
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-6 lg:p-8 flex flex-col gap-8 animate-in slide-in-from-bottom-4 duration-700">
-
-      {/* Top Navigation & Timer */}
-      <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border border-muted/50 rounded-3xl p-4 shadow-xl flex items-center justify-between">
+    <div className="flex flex-col gap-6 p-4 md:p-6 animate-in fade-in duration-500 pb-24">
+      {/* Header Info */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-3xl border border-slate-100 shadow-sm">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="rounded-full">
-            <X size={20} />
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="rounded-full h-10 w-10 hover:bg-slate-50">
+            <ChevronLeft size={24} className="text-slate-500" />
           </Button>
-          <div className="hidden md:block">
-            <h2 className="font-black text-lg truncate max-w-[200px]">{testData?.testName}</h2>
-            <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground uppercase tracking-widest">
-              <Hash size={12} /> Question {currentQuestionIndex + 1} of {testData?.totalQuestions}
+          <div>
+            <h1 className="text-lg font-bold text-slate-900">{testData?.testName}</h1>
+            <div className="flex items-center gap-3 mt-0.5">
+              <Badge variant="secondary" className="bg-slate-100 text-slate-500 text-[10px] font-bold py-0 h-5">
+                QUESTION {currentQuestionIndex + 1} OF {testData?.totalQuestions}
+              </Badge>
+              {initialTimeLeft !== null && (
+                <TestTimer initialSeconds={initialTimeLeft} onTimeUp={handleAutoSubmit} />
+              )}
             </div>
           </div>
         </div>
-
-        <div className="flex items-center gap-6">
-          {/* Timer */}
-          <div className={`flex items-center gap-2 px-6 py-2.5 rounded-2xl border-2 transition-colors ${timeLeft && timeLeft < 300 ? 'border-destructive/30 bg-destructive/5 text-destructive animate-pulse' : 'border-primary/10 bg-primary/5 text-primary'}`}>
-            <Timer size={20} className={timeLeft && timeLeft < 300 ? 'animate-bounce' : ''} />
-            <span className="text-xl font-black tabular-nums">{timeLeft !== null ? formatTime(timeLeft) : '--:--'}</span>
+        
+        <div className="flex items-center gap-4">
+          <div className="flex-1 md:w-48 h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-indigo-600 transition-all duration-500 rounded-full shadow-[0_0_8px_rgba(79,70,229,0.3)]" 
+              style={{ width: `${progress}%` }} 
+            />
           </div>
-
-          <Button
-            onClick={() => setShowConfirmSubmit(true)}
-            className="hidden md:flex bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl px-6 h-11 gap-2 shadow-lg shadow-emerald-500/25"
-          >
-            <Send size={18} /> Finish Test
-          </Button>
+          <span className="text-[10px] font-bold text-slate-400 tabular-nums whitespace-nowrap">{Math.round(progress)}% COMPLETE</span>
         </div>
-      </header>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Main Quiz Area */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Main Area */}
         <div className="lg:col-span-8 space-y-6">
-          {/* Progress Bar */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-              <span>Overall Progress</span>
-              <span>{Math.round(progress)}% Complete</span>
+          {currentQuestion && (
+            <QuestionCard
+              question={currentQuestion}
+              index={currentQuestionIndex}
+              isSelected={(optionId) => localAnswers[currentQuestion.id] === optionId}
+              isFlagged={flaggedQuestions.includes(currentQuestion.id)}
+              onSelectOption={handleSelectOption}
+              onToggleFlag={handleToggleFlag}
+              onReset={handleResetAnswer}
+            />
+          )}
+        </div>
+
+        {/* Sidebar */}
+        <aside className="lg:col-span-4 space-y-6">
+          <QuestionNavigator
+            questions={testData?.questions || []}
+            currentIdx={currentQuestionIndex}
+            answers={localAnswers}
+            flagged={flaggedQuestions}
+            onNavigate={(idx) => setCurrentQuestionIndex(idx)}
+          />
+
+          <Card className="border-0 shadow-xl shadow-indigo-100 rounded-3xl bg-gradient-to-br from-indigo-600 to-violet-700 p-6 text-white">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <Target size={20} />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">Target Goal</p>
+                <p className="text-lg font-bold">Min {testData?.minAttempt} Correct</p>
+              </div>
             </div>
-            <Progress value={progress} className="h-2 rounded-full bg-muted shadow-inner" />
+            <Progress value={(Object.keys(localAnswers).length / (testData?.minAttempt || 1)) * 100} className="h-1.5 bg-white/10" />
+          </Card>
+        </aside>
+      </div>
+
+      {/* Fixed Bottom Navigation Bar */}
+      <div className="fixed bottom-0 left-0 right-0 md:left-64 bg-white/80 backdrop-blur-xl border-t border-slate-200 p-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <Button
+            variant="outline"
+            disabled={currentQuestionIndex === 0}
+            onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
+            className="rounded-xl h-12 px-6 font-bold border-slate-200 text-slate-600 hover:bg-slate-50 transition-all flex-1 md:flex-none"
+          >
+            <ChevronLeft className="mr-2" size={20} /> Previous
+          </Button>
+
+          <div className="hidden md:flex flex-col items-center gap-0.5">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Question</span>
+            <span className="text-sm font-bold text-slate-700">{currentQuestionIndex + 1} <span className="text-slate-300 mx-1">/</span> {testData?.totalQuestions}</span>
           </div>
 
-          {/* Question Card */}
-          {currentQuestion && (
-            <Card className="rounded-[2.5rem] border-0 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-500">
-              <CardHeader className="bg-muted/30 p-8 border-b">
-                <div className="flex justify-between items-start gap-4">
-                  <div className="space-y-1">
-                    <Badge variant="secondary" className="bg-primary/10 text-primary text-[10px] font-black tracking-widest uppercase rounded-full">Question {currentQuestionIndex + 1}</Badge>
-                    <CardTitle className="text-2xl font-bold leading-snug pt-2">
-                      {currentQuestion.question_text}
-                    </CardTitle>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={`rounded-full shrink-0 ${flaggedQuestions.includes(currentQuestion.id) ? 'text-amber-500 bg-amber-500/10' : 'text-muted-foreground'}`}
-                    onClick={() => handleToggleFlag(currentQuestion.id)}
-                  >
-                    <Flag size={20} fill={flaggedQuestions.includes(currentQuestion.id) ? "currentColor" : "none"} />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-8 space-y-4">
-                <div className="grid grid-cols-1 gap-4">
-                  {currentQuestion.options.map((option, idx) => {
-                    const isSelected = localAnswers[currentQuestion.id] === option.id;
-                    return (
-                      <button
-                        key={option.id}
-                        onClick={() => handleSelectOption(currentQuestion.id, option.id)}
-                        className={`flex items-center gap-4 p-5 rounded-2xl border-2 text-left transition-all duration-300 group ${isSelected
-                            ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10 ring-4 ring-primary/5'
-                            : 'border-muted hover:border-primary/30 hover:bg-muted/50'
-                          }`}
-                      >
-                        <div className={`h-8 w-8 rounded-lg border-2 flex items-center justify-center font-bold transition-colors ${isSelected ? 'bg-primary border-primary text-white' : 'border-muted-foreground/30 text-muted-foreground group-hover:border-primary/50 group-hover:text-primary'
-                          }`}>
-                          {String.fromCharCode(65 + idx)}
-                        </div>
-                        <span className={`flex-1 text-lg font-medium ${isSelected ? 'text-primary font-bold' : 'text-foreground'}`}>
-                          {option.option_text}
-                        </span>
-                        {isSelected && <CheckCircle2 className="h-6 w-6 text-primary animate-in zoom-in-50 duration-300" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Navigation Buttons */}
-          <div className="flex justify-between items-center gap-4 pt-4">
-            <Button
-              variant="outline"
-              size="lg"
-              disabled={currentQuestionIndex === 0}
-              onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
-              className="rounded-2xl h-14 px-8 font-bold border-muted-foreground/10 hover:bg-muted"
-            >
-              <ChevronLeft className="mr-2" /> Previous
-            </Button>
-
+          <div className="flex items-center gap-3 flex-1 md:flex-none">
             {isLastQuestion ? (
               <Button
-                size="lg"
-                className="rounded-2xl h-14 px-10 font-black text-lg bg-emerald-600 hover:bg-emerald-700 shadow-xl shadow-emerald-500/20"
                 onClick={() => setShowConfirmSubmit(true)}
+                className="w-full md:w-auto rounded-xl h-12 px-10 font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20"
               >
-                Submit Final Test <Send className="ml-2" size={18} />
+                Submit Test <Send className="ml-2" size={18} />
               </Button>
             ) : (
               <Button
-                size="lg"
                 onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
-                className="rounded-2xl h-14 px-10 font-black text-lg bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20"
+                className="w-full md:w-auto rounded-xl h-12 px-10 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20"
               >
-                Next Question <ChevronRight className="ml-2" />
+                Next Question <ChevronRight className="ml-2" size={20} />
               </Button>
             )}
           </div>
         </div>
-
-        {/* Sidebar Status Panel */}
-        <aside className="lg:col-span-4 sticky top-28 space-y-6">
-          <Card className="rounded-[2rem] border-0 shadow-xl bg-card/50 backdrop-blur-md">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-sm font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                <AlertCircle size={16} /> Question Navigator
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-5 gap-2">
-                {testData?.questions.map((q, idx) => {
-                  const isAnswered = localAnswers[q.id] !== undefined;
-                  const isFlagged = flaggedQuestions.includes(q.id);
-                  const isCurrent = currentQuestionIndex === idx;
-
-                  return (
-                    <button
-                      key={q.id}
-                      onClick={() => setCurrentQuestionIndex(idx)}
-                      className={`h-11 rounded-xl font-bold text-sm transition-all duration-300 relative group ${isCurrent
-                          ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-110 z-10'
-                          : isAnswered
-                            ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
-                            : 'bg-muted text-muted-foreground border border-transparent hover:border-primary/30'
-                        }`}
-                    >
-                      {idx + 1}
-                      {isFlagged && (
-                        <div className="absolute -top-1 -right-1 h-3 w-3 bg-amber-500 rounded-full border-2 border-background animate-bounce" />
-                      )}
-                      {isAnswered && !isCurrent && (
-                        <div className="absolute -bottom-1 -right-1 h-2 w-2 bg-emerald-500 rounded-full" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="mt-8 pt-6 border-t space-y-3">
-                <div className="flex items-center justify-between text-xs font-bold">
-                  <span className="flex items-center gap-1.5 text-muted-foreground"><div className="h-3 w-3 rounded-full bg-primary" /> Current</span>
-                  <span className="flex items-center gap-1.5 text-muted-foreground"><div className="h-3 w-3 rounded-full bg-emerald-500/50" /> Answered</span>
-                  <span className="flex items-center gap-1.5 text-muted-foreground"><div className="h-3 w-3 rounded-full bg-amber-500" /> Flagged</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Stats Card */}
-          <Card className="rounded-[2rem] border-0 shadow-xl bg-gradient-to-br from-primary/5 to-indigo-500/5 overflow-hidden">
-            <CardContent className="p-6 flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Minimum Required</p>
-                <p className="text-lg font-bold">{testData?.minAttempt} Questions</p>
-              </div>
-              <div className="h-12 w-12 rounded-2xl bg-white/50 backdrop-blur-sm flex items-center justify-center text-primary shadow-inner">
-                <HelpCircle size={24} />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Button
-            onClick={() => setShowConfirmSubmit(true)}
-            className="w-full md:hidden bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl h-14 gap-2 shadow-lg shadow-emerald-500/25"
-          >
-            <Send size={18} /> Finish & Submit Test
-          </Button>
-        </aside>
       </div>
 
       {/* Confirmation Dialog */}

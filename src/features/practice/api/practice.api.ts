@@ -1,7 +1,7 @@
 import api from '../../../lib/axios';
 import { API_ROUTES } from '../../../constants/apiRoute';
 import type apiResponse from '../../../types/apiResponse';
-import type { AttemptResult, SubmitAttemptPayload } from '../../../types/practice';
+import type { AttemptResult, SubmitAttemptPayload, AttemptHistoryItem, AttemptReview } from '../../../types/practice';
 import { getTestById } from '../../test/api/test.api';
 import { getQuestionAnsById } from '../../mcq/api/mcq.api';
 import type { PracticeQuestion } from '../../../types/practice';
@@ -11,23 +11,28 @@ import type { PracticeQuestion } from '../../../types/practice';
 // Step 2: fetch each question with options in parallel via getQuestionAnsById
 export const fetchTestWithQuestions = async (
   testId: number,
-): Promise<{ testName: string; durationMinutes: number; totalQuestions: number; minAttempt: number; questions: PracticeQuestion[] }> => {
-  const testData = await getTestById(testId);
-  const questionIds = Array.isArray(testData.question_ids)
-    ? (testData.question_ids as number[])
-    : [];
+): Promise<{
+  testName: string;
+  durationMinutes: number;
+  totalQuestions: number;
+  minAttempt: number;
+  questions: PracticeQuestion[];
+}> => {
+  const response = await api.post(API_ROUTES.GET_FULL_TEST_DETAILS, { id: testId });
+  const result = response.data;
 
-  // Fetch all questions with options in parallel
-  const questionDetails = await Promise.all(
-    questionIds.map((id) => getQuestionAnsById(id)),
-  );
+  if (!result.isSuccess || !result.data) {
+    throw new Error(result.message || 'Failed to fetch test details');
+  }
 
-  const questions: PracticeQuestion[] = questionDetails.map((q) => ({
-    id: q.id ?? q.question?.id ?? 0,
-    question_text: q.question_text ?? q.question?.question_text ?? '',
-    difficulty_level: q.difficulty_level ?? q.question?.difficulty_level,
-    category_name: q.category_name ?? q.question?.category_name,
-    options: (q.options ?? []).map((o) => ({
+  const { test, questions: rawQuestions } = result.data;
+
+  const questions: PracticeQuestion[] = rawQuestions.map((q: any) => ({
+    id: q.id,
+    question_text: q.question_text,
+    difficulty_level: q.difficulty_level,
+    category_name: q.category_name,
+    options: (q.options || []).map((o: any) => ({
       id: o.id,
       option_text: o.option_text,
       is_correct: o.is_correct,
@@ -35,10 +40,10 @@ export const fetchTestWithQuestions = async (
   }));
 
   return {
-    testName: testData.test.name,
-    durationMinutes: testData.test.duration_minutes,
-    totalQuestions: testData.test.total_questions,
-    minAttempt: Number(testData.test.min_no_of_question_attempt ?? 0),
+    testName: test.name,
+    durationMinutes: test.duration_minutes,
+    totalQuestions: test.total_questions,
+    minAttempt: Number(test.min_no_of_question_attempt ?? 0),
     questions,
   };
 };
@@ -62,5 +67,18 @@ export const submitAttempt = async (
   payload: SubmitAttemptPayload,
 ): Promise<apiResponse<AttemptResult>> => {
   const response = await api.post(API_ROUTES.SUBMIT_ATTEMPT, payload);
+  return response.data;
+};
+// ── Fetch history of all attempts for the current student ─────────────────────
+// Backend SP: SpAttempt/4
+export const fetchPracticeHistory = async (): Promise<apiResponse<AttemptHistoryItem[]>> => {
+  const response = await api.post(API_ROUTES.GET_ATTEMPT_HISTORY, {});
+  return response.data;
+};
+
+// ── Fetch detailed review for a specific attempt ──────────────────────────────
+// Backend SP: SpAttempt/3
+export const fetchAttemptReview = async (attemptId: number): Promise<apiResponse<AttemptReview>> => {
+  const response = await api.post(API_ROUTES.GET_ATTEMPT_REVIEW, { attempt_id: attemptId });
   return response.data;
 };

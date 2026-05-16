@@ -9,9 +9,13 @@ import {
   ArrowRight,
   TrendingUp,
   Target,
-  Award
+  Award,
+  Hash,
+  Calendar,
+  Activity
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { Badge } from '../../components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
 import type { AttemptResult } from '../../types/practice';
 
@@ -41,109 +45,176 @@ const PracticeResultPage: React.FC = () => {
   const isPass = percentage >= 40; // Default pass mark 40%
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-8 lg:p-12 animate-in zoom-in-95 duration-700">
-      <Card className="rounded-[3rem] border-0 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] overflow-hidden">
-        {/* Top Header Section */}
-        <CardHeader className={`p-10 md:p-16 text-center relative overflow-hidden ${isPass ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : 'bg-gradient-to-br from-rose-500 to-orange-600'}`}>
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
-          
-          <div className="relative z-10 space-y-6">
-            <div className="inline-flex h-24 w-24 rounded-full bg-white/20 backdrop-blur-xl items-center justify-center shadow-2xl border border-white/30 animate-bounce">
-              {isPass ? <Trophy size={48} className="text-white" /> : <Award size={48} className="text-white" />}
-            </div>
+    <div className="min-h-screen bg-slate-50/50 p-4 md:p-8 lg:p-12 animate-in fade-in duration-1000">
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* Main Result Card */}
+        <Card className="border-0 shadow-2xl shadow-slate-200/60 rounded-[3rem] overflow-hidden bg-white">
+          <div className="grid grid-cols-1 md:grid-cols-12">
             
-            <div className="space-y-2">
-                <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
+            {/* Left Side: Score Visualization */}
+            <div className={`md:col-span-5 p-8 md:p-12 text-white flex flex-col items-center justify-center text-center relative overflow-hidden ${isPass ? 'bg-gradient-to-br from-indigo-600 to-violet-700' : 'bg-gradient-to-br from-slate-700 to-slate-900'}`}>
+              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} />
+              
+              <div className="relative z-10 space-y-6">
+                <div className="relative inline-flex items-center justify-center">
+                  {/* Circular Progress Path */}
+                  <svg className="w-40 h-40 transform -rotate-90">
+                    <circle
+                      cx="80"
+                      cy="80"
+                      r="70"
+                      stroke="currentColor"
+                      strokeWidth="8"
+                      fill="transparent"
+                      className="text-white/10"
+                    />
+                    <circle
+                      cx="80"
+                      cy="80"
+                      r="70"
+                      stroke="currentColor"
+                      strokeWidth="8"
+                      fill="transparent"
+                      strokeDasharray={440}
+                      strokeDashoffset={440 - (440 * percentage) / 100}
+                      strokeLinecap="round"
+                      className="text-white transition-all duration-1000 ease-out"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-4xl font-black">{percentage}%</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">Score</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-bold tracking-tight">
                     {isPass ? 'Excellent Work!' : 'Good Effort!'}
-                </h1>
-                <p className="text-white/80 text-xl font-medium max-w-md mx-auto">
+                  </h2>
+                  <p className="text-white/70 text-sm leading-relaxed max-w-[200px] mx-auto">
                     {isPass 
-                      ? 'You have successfully completed the practice session with flying colors.' 
-                      : 'Every attempt is a step closer to mastery. Review your weak areas and try again.'}
-                </p>
+                      ? 'You have mastered this test section.' 
+                      : 'Keep practicing to improve your score.'}
+                  </p>
+                </div>
+
+                <div className="pt-4">
+                  {isPass ? (
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                      <Trophy size={14} /> Passed
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-wider">
+                      <Activity size={14} /> Completed
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
-        </CardHeader>
 
-        <CardContent className="p-8 md:p-12 space-y-12 bg-background">
-          {/* Score Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-             <div className="p-8 rounded-[2.5rem] bg-muted/30 border text-center space-y-2">
-                <div className="flex justify-center mb-2"><TrendingUp size={24} className="text-primary" /></div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Percentage</p>
-                <h3 className="text-4xl font-black text-primary">{percentage}%</h3>
-             </div>
+            {/* Right Side: Details & Stats */}
+            <div className="md:col-span-7 p-8 md:p-12 bg-white flex flex-col justify-between">
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
+                    <TrendingUp size={14} className="text-indigo-600" /> Performance Breakdown
+                  </h3>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-5 rounded-3xl bg-emerald-50 border border-emerald-100/50 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <CheckCircle2 size={18} className="text-emerald-500" />
+                        <span className="text-2xl font-black text-emerald-700">{result.correct_answers}</span>
+                      </div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600/70">Correct</p>
+                    </div>
 
-             <div className="p-8 rounded-[2.5rem] bg-emerald-500/5 border border-emerald-500/10 text-center space-y-2">
-                <div className="flex justify-center mb-2"><CheckCircle2 size={24} className="text-emerald-500" /></div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Correct</p>
-                <h3 className="text-4xl font-black text-emerald-600">{result.correct_answers}</h3>
-             </div>
-
-             <div className="p-8 rounded-[2.5rem] bg-rose-500/5 border border-rose-500/10 text-center space-y-2">
-                <div className="flex justify-center mb-2"><XCircle size={24} className="text-rose-500" /></div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Incorrect</p>
-                <h3 className="text-4xl font-black text-rose-600">{result.total_questions - result.correct_answers}</h3>
-             </div>
-          </div>
-
-          {/* Detailed Breakdown */}
-          <div className="space-y-6">
-             <div className="flex items-center gap-2 px-2">
-                <div className="h-4 w-4 rounded-full bg-primary" />
-                <h3 className="text-lg font-black tracking-tight">Performance Summary</h3>
-             </div>
-             
-             <div className="p-8 rounded-[2.5rem] border-2 border-dashed bg-muted/10 space-y-6">
-                <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground font-bold italic">Attempt ID: #{result.attempt_id}</span>
-                    <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-0 rounded-full px-4 font-black">COMPLETED</Badge>
+                    <div className="p-5 rounded-3xl bg-rose-50 border border-rose-100/50 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <XCircle size={18} className="text-rose-500" />
+                        <span className="text-2xl font-black text-rose-700">{result.total_questions - result.correct_answers}</span>
+                      </div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-rose-600/70">Incorrect</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
-                    <div className="flex items-center justify-between group">
-                        <span className="text-muted-foreground font-medium">Total Questions Attempted</span>
-                        <span className="text-xl font-black group-hover:scale-110 transition-transform">{result.total_questions}</span>
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-slate-400 shadow-sm">
+                        <Target size={18} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Accuracy</p>
+                        <p className="text-sm font-bold text-slate-700">High Precision</p>
+                      </div>
                     </div>
-                    <div className="h-px bg-muted" />
-                    <div className="flex items-center justify-between group">
-                        <span className="text-muted-foreground font-medium">Final Score Achieved</span>
-                        <span className="text-xl font-black group-hover:scale-110 transition-transform">{result.score} pts</span>
+                    <span className="text-lg font-black text-slate-900">{percentage}%</span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-slate-400 shadow-sm">
+                        <Hash size={18} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Score</p>
+                        <p className="text-sm font-bold text-slate-700">Points Earned</p>
+                      </div>
                     </div>
+                    <span className="text-lg font-black text-slate-900">{result.score} pts</span>
+                  </div>
                 </div>
-             </div>
-          </div>
+              </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-4">
-             <Button 
-                size="lg" 
-                onClick={() => navigate(`/practice/test/${testId}`)}
-                className="flex-1 rounded-2xl h-14 text-lg font-black shadow-xl shadow-primary/20 bg-primary hover:bg-primary/90 gap-2"
-             >
-                <RotateCcw size={20} /> Retake Test
-             </Button>
-             
-             <Button 
-                size="lg" 
-                variant="outline"
-                onClick={() => navigate('/practice')}
-                className="flex-1 rounded-2xl h-14 text-lg font-black border-muted-foreground/10 hover:bg-muted gap-2"
-             >
-                <Home size={20} /> Practice Hub
-             </Button>
-
-             <Button 
-                size="lg" 
-                variant="ghost"
-                onClick={() => navigate('/')}
-                className="flex-1 rounded-2xl h-14 text-lg font-black gap-2"
-             >
-                Dashboard <ArrowRight size={20} />
-             </Button>
+              {/* Summary Footer */}
+              <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Calendar size={14} />
+                  <span className="text-[10px] font-bold uppercase tracking-tight">Attempt #{result.attempt_id}</span>
+                </div>
+                <Badge className="bg-slate-900 text-white hover:bg-slate-800 rounded-full text-[10px] font-bold px-3 py-1">FINAL RESULT</Badge>
+              </div>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </Card>
+
+          {/* Action Buttons Container */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in slide-in-from-bottom-4 duration-1000 delay-300">
+            <Button 
+              onClick={() => navigate(`/practice/review/${result.attempt_id}`)}
+              className="w-full sm:w-auto min-w-[200px] rounded-2xl h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-xl shadow-emerald-200 transition-all hover:scale-105 active:scale-95 gap-2"
+            >
+              <CheckCircle2 size={20} /> Review Questions
+            </Button>
+
+            <Button 
+              onClick={() => navigate(`/practice/test/${testId}`)}
+              className="w-full sm:w-auto min-w-[200px] rounded-2xl h-14 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xl shadow-indigo-200 transition-all hover:scale-105 active:scale-95 gap-2"
+            >
+              <RotateCcw size={20} /> Retake Practice
+            </Button>
+            
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/practice')}
+              className="w-full sm:w-auto min-w-[200px] rounded-2xl h-14 bg-white border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all hover:scale-105 active:scale-95 gap-2"
+            >
+              <Home size={20} /> Practice Hub
+            </Button>
+          </div>
+          
+          <div className="flex justify-center mt-4">
+            <Button 
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="text-slate-400 font-bold hover:text-indigo-600 transition-colors gap-2"
+            >
+              Back to Dashboard <ArrowRight size={18} />
+            </Button>
+          </div>
+      </div>
     </div>
   );
 };

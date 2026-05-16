@@ -21,6 +21,8 @@ import PracticeHomePage from "../pages/practice/PracticeHomePage";
 import PracticeBrowsePage from "../pages/practice/PracticeBrowsePage";
 import PracticeTestPage from "../pages/practice/PracticeTestPage";
 import PracticeResultPage from "../pages/practice/PracticeResultPage";
+import PracticeReviewPage from "../pages/practice/PracticeReviewPage";
+import PracticeHistoryPage from "../pages/practice/PracticeHistoryPage";
 
 
 export const router = createBrowserRouter([
@@ -144,6 +146,14 @@ export const router = createBrowserRouter([
                             {
                                 path: "result/:testId",
                                 element: <PracticeResultPage />
+                            },
+                            {
+                                path: "review/:attemptId",
+                                element: <PracticeReviewPage />
+                            },
+                            {
+                                path: "history",
+                                element: <PracticeHistoryPage />
                             }
                         ]
                     }
