@@ -91,15 +91,15 @@ const FranchiseForm = ({ initialData }: FranchiseFormProps) => {
             contact_email: variables.contact_email,
             name: variables.name,
             owner_name: variables.name,
-            id: Number(data.data.id),
+            id: Number(data.data?.id),
             password: variables.password
           })
           console.log(fData);
         }
-        showToast.success(data?.message);
+        showToast.success(data?.message || "");
         // navigate("/franchise");
       } else {
-        showToast.error(data?.message);
+        showToast.error(data?.message || "");
       }
     },
     onError: (error) => {

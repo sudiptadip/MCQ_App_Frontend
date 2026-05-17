@@ -7,21 +7,28 @@ import {
   ListChevronsDownUp,
   ClipboardCheck,
   Monitor,
-  GraduationCap
+  GraduationCap,
+  History
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { ROLES, STORAGE_KEYS } from "../../constants";
+import { storage } from "../../utils/storage";
+import type { User } from "../../features/auth/types";
+
+const { SUPER_ADMIN, STUDENT, FRANCHISE_ADMIN } = ROLES;
 
 // Define the nav items outside the component
 export const navItems = [
-  { icon: <LayoutDashboard size={20} />, label: "Dashboard", path: "/" },
-  { icon: <ContactRound size={20} />, label: "Franchise", path: "/franchise" },
-  { icon: <Users size={20} />, label: "Student", path: "/student" },
-  { icon: <ListChevronsDownUp size={20} />, label: "Category", path: "/category" },
-  { icon: <BookOpen size={20} />, label: "Questions & Answers", path: "/question-ans" },
-  { icon: <ClipboardCheck size={20} />, label: "Tests", path: "/test" },
-  { icon: <Monitor size={20} />, label: "Display Views", path: "/display-view" },
-  { icon: <GraduationCap size={20} />, label: "Practice", path: "/practice" },
-  { icon: <Settings size={20} />, label: "Settings", path: "/settings" },
+  { icon: <LayoutDashboard size={20} />, label: "Dashboard", path: "/", roles: [SUPER_ADMIN, FRANCHISE_ADMIN, STUDENT] },
+  { icon: <ContactRound size={20} />, label: "Franchise", path: "/franchise", roles: [SUPER_ADMIN] },
+  { icon: <Users size={20} />, label: "Student", path: "/student", roles: [SUPER_ADMIN, FRANCHISE_ADMIN] },
+  { icon: <ListChevronsDownUp size={20} />, label: "Category", path: "/category", roles: [SUPER_ADMIN, FRANCHISE_ADMIN] },
+  { icon: <BookOpen size={20} />, label: "Questions & Answers", path: "/question-ans", roles: [SUPER_ADMIN, FRANCHISE_ADMIN] },
+  { icon: <ClipboardCheck size={20} />, label: "Tests", path: "/test", roles: [SUPER_ADMIN, FRANCHISE_ADMIN] },
+  { icon: <Monitor size={20} />, label: "Display Views", path: "/display-view", roles: [SUPER_ADMIN, FRANCHISE_ADMIN] },
+  { icon: <GraduationCap size={20} />, label: "Practice", path: "/practice", roles: [SUPER_ADMIN, FRANCHISE_ADMIN, STUDENT] },
+  { icon: <History size={20} />, label: "History", path: "/practice/history", roles: [SUPER_ADMIN, FRANCHISE_ADMIN, STUDENT] },
+  { icon: <Settings size={20} />, label: "Settings", path: "/settings", roles: [SUPER_ADMIN, FRANCHISE_ADMIN, STUDENT] },
 ];
 
 interface SidebarMenuProps {
@@ -31,10 +38,14 @@ interface SidebarMenuProps {
 
 const SidebarMenu = ({ isSidebarOpen, isMobile }: SidebarMenuProps) => {
   const location = useLocation();
+  const user = storage.get<User>(STORAGE_KEYS.USER);
+  const userRole = user?.role || STUDENT;
+
+  const filteredItems = navItems.filter(item => item.roles.includes(userRole));
 
   return (
     <>
-      {navItems.map((item) => (
+      {filteredItems.map((item) => (
         <Link
           key={item.label}
           to={item.path}

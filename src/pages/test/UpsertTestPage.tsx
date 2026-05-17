@@ -64,8 +64,8 @@ const UpsertTestPage = () => {
 
   // ─── Filter state ─────────────────────────────────────────────────────
   const [filters, setFilters] = useState<QuestionFilterParams>({ page: 1, page_size: DEFAULT_PAGE_SIZE });
-  const [parentCategoryId, setParentCategoryId] = useState<number | undefined>();
-  const [childCategories, setChildCategories] = useState<Category[]>([]);
+  const [, setParentCategoryId] = useState<number | undefined>();
+const [childCategories, setChildCategories] = useState<Category[]>([]);
   const [isLoadingChildren, setIsLoadingChildren] = useState(false);
 
   // Tab state (edit mode only)

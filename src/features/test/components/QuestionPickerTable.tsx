@@ -1,4 +1,3 @@
-import React from "react";
 import { cn } from "../../../lib/utils";
 import { CheckSquare2, Square, Loader2, BookOpen, AlertCircle } from "lucide-react";
 import type { QuestionWithDetails } from "../../mcq/api/mcq.api";

@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import FranchiseForm from "../../features/franchise/components/FranchiseForm";
-import type Franchise from "../../types/database/Franchise";
+
 
 import { getFranchiseById } from "../../features/franchise/api/franchise.api";
 

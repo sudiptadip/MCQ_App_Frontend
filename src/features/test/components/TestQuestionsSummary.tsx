@@ -1,4 +1,3 @@
-import React from "react";
 import { X, BookOpen } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import type { QuestionWithDetails } from "../../mcq/api/mcq.api";

@@ -9,14 +9,14 @@ import {
   ArrowRight,
   TrendingUp,
   Target,
-  Award,
   Hash,
   Calendar,
   Activity
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
+import { Card } from '../../components/ui/card';
+
 import type { AttemptResult } from '../../types/practice';
 
 const PracticeResultPage: React.FC = () => {

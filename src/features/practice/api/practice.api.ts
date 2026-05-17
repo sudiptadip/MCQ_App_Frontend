@@ -2,8 +2,7 @@ import api from '../../../lib/axios';
 import { API_ROUTES } from '../../../constants/apiRoute';
 import type apiResponse from '../../../types/apiResponse';
 import type { AttemptResult, SubmitAttemptPayload, AttemptHistoryItem, AttemptReview } from '../../../types/practice';
-import { getTestById } from '../../test/api/test.api';
-import { getQuestionAnsById } from '../../mcq/api/mcq.api';
+
 import type { PracticeQuestion } from '../../../types/practice';
 
 // ── Fetch full test with all questions + options ──────────────────────────────

@@ -38,11 +38,11 @@ const MCQCategory = () => {
     mutationFn: upsertCategory,
     onSuccess: (res) => {
       if (res.isSuccess) {
-        showToast.success(res.message);
+        showToast.success(res.message || "");
         queryClient.invalidateQueries({ queryKey: ['categories'] });
         setSelectedItem(null);
       } else {
-        showToast.error(res.message);
+        showToast.error(res.message || "");
       }
     },
     onError: (err) => showToast.apiErrorShow(err)
@@ -52,12 +52,12 @@ const MCQCategory = () => {
     mutationFn: deleteCategory,
     onSuccess: (res) => {
       if (res.isSuccess) {
-        showToast.success(res.message);
+        showToast.success(res.message || "");
         queryClient.invalidateQueries({ queryKey: ['categories'] });
         setDeleteId(null);
         if (selectedItem?.id === deleteId) setSelectedItem(null);
       } else {
-        showToast.error(res.message);
+        showToast.error(res.message || "");
       }
     },
     onError: (err) => showToast.apiErrorShow(err)

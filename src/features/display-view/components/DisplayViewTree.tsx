@@ -86,7 +86,7 @@ const DisplayViewTree: React.FC<DisplayViewTreeProps> = ({
   const treeData = buildTree(items);
 
   const handleMove = useCallback(
-    ({ dragIds, parentId, index }: { dragIds: string[]; parentId: string | null; index: number }) => {
+    ({ dragIds, parentId }: { dragIds: string[]; parentId: string | null; index: number }) => {
       const dragIdStr = dragIds[0];
       // Don't allow moving tests or dropping into tests
       if (dragIdStr.startsWith('test-')) return;

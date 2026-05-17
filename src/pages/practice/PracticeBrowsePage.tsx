@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import {
   Folder,
   ChevronRight,
-  ClipboardList,
   ArrowLeft,
   Home,
   Play,

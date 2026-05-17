@@ -1,7 +1,6 @@
 import React from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  ChevronLeft, 
   CheckCircle2, 
   XCircle, 
   AlertCircle,
@@ -12,7 +11,7 @@ import {
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
-import type { PracticeQuestion } from '../../types/practice';
+
 
 import { useQuery } from '@tanstack/react-query';
 import { fetchAttemptReview } from '../../features/practice/api/practice.api';
@@ -21,7 +20,7 @@ import Loading from '../../components/common/Loading';
 const PracticeReviewPage: React.FC = () => {
   const { attemptId } = useParams<{ attemptId: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
+
   
   const attemptIdNum = Number(attemptId);
 

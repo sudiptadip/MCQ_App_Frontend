@@ -37,8 +37,8 @@ const LoginForm = () => {
     mutationFn: loginUser,
     onSuccess: (data) => {
       showToast.success("Logged in successfully");
-      storage.set(STORAGE_KEYS.TOKEN, data.data.token);
-      storage.set(STORAGE_KEYS.USER, data.data.user);
+      storage.set(STORAGE_KEYS.TOKEN, data.data!.token);
+      storage.set(STORAGE_KEYS.USER, data.data!.user);
       navigate("/");
     },
     onError: (error: any) => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LayoutList, ArrowLeft } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { getParentCategories, getCategoriesByParentId } from '../../features/category/api/category.api';
 import { upsertQuestionAns, getQuestionAnsById } from '../../features/mcq/api/mcq.api';
@@ -20,7 +20,7 @@ interface OptionData {
 
 const UpsertMcqQuestionAnsPage = () => {
     const queryClient = useQueryClient();
-    const location = useLocation();
+
     const navigate = useNavigate();
     const { id } = useParams();
     const isEditMode = !!id;

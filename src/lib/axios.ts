@@ -33,6 +33,8 @@ api.interceptors.response.use(
       storage.remove(STORAGE_KEYS.TOKEN);
       storage.remove(STORAGE_KEYS.USER);
       window.location.href = '/login';
+    } else if (error.response?.status === 403) {
+      window.location.href = '/403';
     }
     return Promise.reject(error);
   }

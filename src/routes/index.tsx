@@ -13,6 +13,7 @@ import StudentFormPage from "../pages/student/StudentFormPage";
 import MCQCategory from "../pages/category/MCQCategory";
 import McqQuestionAnsListPage from "../pages/mcq/McqQuestionAnsListPage";
 import UpsertMcqQuestionAnsPage from "../pages/mcq/UpsertMcqQuestionAnsPage";
+import UploadMcqQuestionAnsPage from "../pages/mcq/UploadMcqQuestionAnsPage";
 import TestListPage from "../pages/test/TestListPage";
 import UpsertTestPage from "../pages/test/UpsertTestPage";
 import DisplayViewListPage from "../pages/display-view/DisplayViewListPage";
@@ -23,6 +24,9 @@ import PracticeTestPage from "../pages/practice/PracticeTestPage";
 import PracticeResultPage from "../pages/practice/PracticeResultPage";
 import PracticeReviewPage from "../pages/practice/PracticeReviewPage";
 import PracticeHistoryPage from "../pages/practice/PracticeHistoryPage";
+import ComingSoonPage from "../pages/ComingSoonPage";
+import AccessDeniedPage from "../pages/AccessDeniedPage";
+import NotFoundPage from "../pages/NotFoundPage";
 
 
 export const router = createBrowserRouter([
@@ -87,6 +91,10 @@ export const router = createBrowserRouter([
                             {
                                 path: "create",
                                 element: <UpsertMcqQuestionAnsPage />
+                            },
+                            {
+                                path: "upload",
+                                element: <UploadMcqQuestionAnsPage />
                             },
                             {
                                 path: "edit/:id",
@@ -156,6 +164,10 @@ export const router = createBrowserRouter([
                                 element: <PracticeHistoryPage />
                             }
                         ]
+                    },
+                    {
+                        path: "settings",
+                        element: <ComingSoonPage title="Settings" description="Settings and configuration options will be available here soon." />
                     }
                 ]
             }
@@ -180,9 +192,18 @@ export const router = createBrowserRouter([
             }
         ]
     },
+    // Error routes
+    {
+        path: "403",
+        element: <AccessDeniedPage />
+    },
+    {
+        path: "404",
+        element: <NotFoundPage />
+    },
     // Fallback redirect
     {
         path: "*",
-        element: <Navigate to="/" replace />
+        element: <Navigate to="/404" replace />
     }
 ])

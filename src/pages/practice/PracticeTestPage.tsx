@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import {
@@ -8,8 +8,6 @@ import {
   Send,
   X,
   CheckCircle2,
-  AlertCircle,
-  HelpCircle,
   Hash,
   Timer,
   Target

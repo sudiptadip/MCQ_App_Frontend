@@ -1,7 +1,7 @@
-import React from "react";
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Plus, Pencil, Trash2, ClipboardCheck, Clock, BookOpen } from "lucide-react";
+import { Plus, Pencil, Trash2, Clock, BookOpen } from "lucide-react";
 import { DataTable, type ColumnDef } from "../../components/ui/DataTable";
 import { getTestList, deleteTest } from "../../features/test/api/test.api";
 import { showToast } from "../../utils/toast";

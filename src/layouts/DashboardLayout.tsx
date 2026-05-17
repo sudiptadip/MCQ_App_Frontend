@@ -1,9 +1,6 @@
-import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard,
   BookOpen,
-  Users,
-  Settings,
   LogOut,
   Menu,
   X,

@@ -195,13 +195,21 @@ const McqQuestionAnsTable = () => {
                     }
                 }}
                 toolbarActions={
-                    <button
-                        className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer"
-                        onClick={() => navigate("/question-ans/create")}
-                    >
-                        <Plus size={14} />
-                        Add Question
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
+                            onClick={() => navigate("/question-ans/upload")}
+                        >
+                            Upload Excel
+                        </button>
+                        <button
+                            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer"
+                            onClick={() => navigate("/question-ans/create")}
+                        >
+                            <Plus size={14} />
+                            Add Question
+                        </button>
+                    </div>
                 }
             />
         </div>

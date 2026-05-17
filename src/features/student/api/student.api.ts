@@ -7,7 +7,7 @@ import type apiResponse from "../../../types/apiResponse";
 export const getStudents = async (): Promise<Student[]> => {
   const response = await api.post(API_ROUTES.GET_STUDENT_LIST, {});
   if (response.data.isSuccess) {
-    return response.data.data as Student[];
+    return (response.data.data as Student[]) || [];
   }
   throw new Error(response.data.message || "Failed to fetch students");
 };

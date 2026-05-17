@@ -41,13 +41,13 @@ const UpsertDisplayViewPage: React.FC = () => {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [assignNode, setAssignNode] = useState<DisplayView | null>(null);
 
-  const { data: allRoots = [], isLoading: loadingRoots, isError: rootsError } = useQuery({
+  const { data: allRoots = [], isLoading: loadingRoots } = useQuery({
     queryKey: ['displayViews'],
     queryFn: getDisplayViews,
     enabled: isEditMode,
   });
 
-  const { data: treeItems = [], isLoading: loadingTree, isError: treeError } = useQuery({
+  const { data: treeItems = [], isLoading: loadingTree } = useQuery({
     queryKey: ['displayViewTree', editRootId],
     queryFn: () => getDisplayViewTree(editRootId!),
     enabled: !!editRootId,
@@ -138,7 +138,7 @@ const UpsertDisplayViewPage: React.FC = () => {
   };
 
   const isDataLoading = loadingRoots || (isEditMode && loadingTree);
-  const isDataError = rootsError || (isEditMode && treeError);
+
 
   if (isEditMode && isDataLoading && !currentRoot) return <Loading message="Fetching display view..." className="h-[600px]" />;
 

@@ -51,3 +51,8 @@ export const getQuestionAnsById = async (id: number): Promise<QuestionWithDetail
   }
   throw new Error(response.data.message || "Failed to fetch question details");
 };
+
+export const bulkUpsertQuestionAns = async (payload: UpsertQuestionPayload[]): Promise<apiResponse<any>> => {
+  const response = await api.post(API_ROUTES.BULK_UPSERT_QUESTION_ANS, { questions: payload });
+  return response.data;
+};
