@@ -10,6 +10,7 @@ import FranchiseList from "../pages/franchise/FranchiseList";
 import FranchiseFormPage from "../pages/franchise/FranchiseFormPage";
 import StudentList from "../pages/student/StudentList";
 import StudentFormPage from "../pages/student/StudentFormPage";
+import StudentDetailsPage from "../pages/student/StudentDetailsPage";
 import MCQCategory from "../pages/category/MCQCategory";
 import McqQuestionAnsListPage from "../pages/mcq/McqQuestionAnsListPage";
 import UpsertMcqQuestionAnsPage from "../pages/mcq/UpsertMcqQuestionAnsPage";
@@ -69,6 +70,10 @@ export const router = createBrowserRouter([
                             {
                                 path: "create",
                                 element: <StudentFormPage />
+                            },
+                            {
+                                path: "details/:userId",
+                                element: <StudentDetailsPage />
                             }
                         ]
                     },
