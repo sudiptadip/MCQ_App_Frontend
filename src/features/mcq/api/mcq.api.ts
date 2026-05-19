@@ -16,6 +16,8 @@ export interface QuestionWithDetails {
   category_id?: number;
   category_name?: string;
   difficulty_level?: string;
+  question_explanation?: string;
+  tag?: string;
   root_category_id?: number;
   parent_category_id?: number;
   options: QuestionOption[];

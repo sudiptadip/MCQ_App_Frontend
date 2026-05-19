@@ -72,6 +72,10 @@ export interface ReviewQuestion {
   difficultyLevel: string;
   userSelectedOptionId: number | null;
   options: ReviewOption[];
+  questionExplanation?: string;
+  question_explanation?: string;
+  tag?: string;
+  tags?: string;
 }
 
 export interface AttemptReview {

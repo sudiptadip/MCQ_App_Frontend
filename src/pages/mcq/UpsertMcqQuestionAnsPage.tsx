@@ -38,6 +38,8 @@ const UpsertMcqQuestionAnsPage = () => {
 
     const [questionText, setQuestionText] = useState("");
     const [difficulty, setDifficulty] = useState("medium");
+    const [questionExplanation, setQuestionExplanation] = useState("");
+    const [tag, setTag] = useState("");
     const [options, setOptions] = useState<OptionData[]>([
         { id: '1', text: '', isCorrect: true },
         { id: '2', text: '', isCorrect: false },
@@ -67,18 +69,22 @@ const UpsertMcqQuestionAnsPage = () => {
         if (isEditMode && fetchedData) {
             const qText = fetchedData.question?.question_text ?? fetchedData.question_text ?? "";
             const qDiff = fetchedData.question?.difficulty_level ?? fetchedData.difficulty_level ?? "medium";
+            const qExplanation = fetchedData.question?.question_explanation ?? fetchedData.question_explanation ?? "";
+            const qTag = fetchedData.question?.tag ?? fetchedData.tag ?? "";
             const qCategoryId = fetchedData.question?.category_id ?? fetchedData.category_id;
-            
-            const qParentId = fetchedData.question?.root_category_id ?? fetchedData.root_category_id ?? 
-                              fetchedData.question?.parent_category_id ?? fetchedData.parent_category_id ?? null;
+
+            const qParentId = fetchedData.question?.root_category_id ?? fetchedData.root_category_id ??
+                fetchedData.question?.parent_category_id ?? fetchedData.parent_category_id ?? null;
 
             setQuestionText(qText);
             setDifficulty(qDiff);
-            
+            setQuestionExplanation(qExplanation);
+            setTag(qTag);
+
             if (qParentId) {
                 const pId = Number(qParentId);
                 const cId = qCategoryId ? Number(qCategoryId) : null;
-                
+
                 if (!isNaN(pId)) {
                     setSelectedParentId(pId);
                     fetchTreeData(pId);
@@ -93,7 +99,7 @@ const UpsertMcqQuestionAnsPage = () => {
                     fetchTreeData(pId);
                 }
             }
-            
+
             if (fetchedData.options && fetchedData.options.length > 0) {
                 setOptions(fetchedData.options.map((o: any) => ({
                     id: o.id?.toString() || Math.random().toString(),
@@ -157,6 +163,8 @@ const UpsertMcqQuestionAnsPage = () => {
                 { id: Math.random().toString(), text: '', isCorrect: false },
             ]);
             setDifficulty("medium");
+            setQuestionExplanation("");
+            setTag("");
             // Reset category selection
             setSelectedParentId(null);
             setSelectedChildId(null);
@@ -191,12 +199,21 @@ const UpsertMcqQuestionAnsPage = () => {
             question: {
                 question_text: questionText,
                 category_id: finalCategoryId,
-                difficulty_level: difficulty
+                difficulty_level: difficulty,
+                question_explanation: questionExplanation || null,
+                tag: tag || null
             },
-            options: options.map(o => ({
-                option_text: o.text,
-                is_correct: o.isCorrect
-            }))
+            options: options.map(o => {
+                const opt: any = {
+                    option_text: o.text,
+                    is_correct: o.isCorrect
+                };
+                const parsedId = parseInt(o.id, 10);
+                if (!isNaN(parsedId) && String(parsedId) === o.id) {
+                    opt.id = parsedId;
+                }
+                return opt;
+            })
         };
 
         if (isEditMode) {
@@ -220,7 +237,7 @@ const UpsertMcqQuestionAnsPage = () => {
                         </p>
                     </div>
                 </div>
-                <button 
+                <button
                     type="button"
                     onClick={() => navigate('/question-ans')}
                     className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
@@ -235,32 +252,36 @@ const UpsertMcqQuestionAnsPage = () => {
                 </div>
             ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                <CategorySelectionCard 
-                    parentCategories={rootCategories || []}
-                    selectedParentId={selectedParentId}
-                    onParentSelect={handleParentSelect}
-                    treeData={treeData}
-                    selectedChildId={selectedChildId}
-                    onChildSelect={handleChildSelect}
-                    isLoadingCategories={isLoadingRootCategories || isLoadingChildren}
-                />
+                    <CategorySelectionCard
+                        parentCategories={rootCategories || []}
+                        selectedParentId={selectedParentId}
+                        onParentSelect={handleParentSelect}
+                        treeData={treeData}
+                        selectedChildId={selectedChildId}
+                        onChildSelect={handleChildSelect}
+                        isLoadingCategories={isLoadingRootCategories || isLoadingChildren}
+                    />
 
-                <QuestionDetailsCard 
-                    questionText={questionText}
-                    setQuestionText={setQuestionText}
-                    difficulty={difficulty}
-                    setDifficulty={setDifficulty}
-                />
+                    <QuestionDetailsCard
+                        questionText={questionText}
+                        setQuestionText={setQuestionText}
+                        difficulty={difficulty}
+                        setDifficulty={setDifficulty}
+                        questionExplanation={questionExplanation}
+                        setQuestionExplanation={setQuestionExplanation}
+                        tag={tag}
+                        setTag={setTag}
+                    />
 
-                <OptionsCard 
-                    options={options}
-                    onAddOption={handleAddOption}
-                    onRemoveOption={handleRemoveOption}
-                    onOptionChange={handleOptionChange}
-                    onSetCorrectOption={handleSetCorrectOption}
-                    isSubmitting={upsertMutation.isPending}
-                />
-            </form>
+                    <OptionsCard
+                        options={options}
+                        onAddOption={handleAddOption}
+                        onRemoveOption={handleRemoveOption}
+                        onOptionChange={handleOptionChange}
+                        onSetCorrectOption={handleSetCorrectOption}
+                        isSubmitting={upsertMutation.isPending}
+                    />
+                </form>
             )}
         </div>
     );

@@ -10,7 +10,9 @@ const TEMPLATE_HEADERS = [
     'Option 2',
     'Option 3',
     'Option 4',
-    'Correct Answer (1-4)'
+    'Correct Answer (1-4)',
+    'Explanation',
+    'Tags'
 ];
 
 export const downloadMcqTemplate = async (categories: Category[]) => {
@@ -53,6 +55,8 @@ export const downloadMcqTemplate = async (categories: Category[]) => {
         { width: 20 }, // Opt 3
         { width: 20 }, // Opt 4
         { width: 20 }, // Correct Ans
+        { width: 30 }, // Explanation
+        { width: 20 }, // Tags
     ];
 
     // Add a sample row
@@ -64,7 +68,9 @@ export const downloadMcqTemplate = async (categories: Category[]) => {
         "Berlin", 
         "Paris", 
         "Madrid", 
-        3
+        3,
+        "Paris is the capital of France.",
+        "geography,capitals"
     ]);
 
     // Apply data validation to rows 2 to 1000

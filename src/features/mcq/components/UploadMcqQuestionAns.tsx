@@ -19,6 +19,8 @@ interface UploadRow {
     option3: string;
     option4: string;
     correct_answer: number | string;
+    question_explanation?: string;
+    tag?: string;
     isValid: boolean;
     errors: string[];
 }
@@ -126,6 +128,8 @@ const UploadMcqQuestionAns = () => {
             option3: row.option3 || '',
             option4: row.option4 || '',
             correct_answer: correctAns || '',
+            question_explanation: row.question_explanation || '',
+            tag: row.tag || '',
             isValid: errors.length === 0,
             errors
         };
@@ -177,6 +181,8 @@ const UploadMcqQuestionAns = () => {
                         option3: row[5]?.toString() || '',
                         option4: row[6]?.toString() || '',
                         correct_answer: row[7]?.toString() || '',
+                        question_explanation: row[8]?.toString() || '',
+                        tag: row[9]?.toString() || '',
                     });
                 });
 
@@ -213,6 +219,8 @@ const UploadMcqQuestionAns = () => {
                     category_id: r.category_id!,
                     difficulty_level: r.difficulty_level.toLowerCase(),
                     question_text: r.question_text,
+                    question_explanation: r.question_explanation || undefined,
+                    tag: r.tag || undefined,
                     is_active: true
                 },
                 options: [
@@ -326,6 +334,8 @@ const UploadMcqQuestionAns = () => {
                                     <th className="p-3 font-semibold min-w-[120px]">Option 3</th>
                                     <th className="p-3 font-semibold min-w-[120px]">Option 4</th>
                                     <th className="p-3 font-semibold w-24">Answer</th>
+                                    <th className="p-3 font-semibold min-w-[150px]">Explanation</th>
+                                    <th className="p-3 font-semibold min-w-[120px]">Tags</th>
                                     <th className="p-3 font-semibold w-10"></th>
                                 </tr>
                             </thead>
@@ -413,6 +423,21 @@ const UploadMcqQuestionAns = () => {
                                             />
                                         </td>
                                         <td className="p-2 align-top">
+                                            <textarea 
+                                                value={row.question_explanation}
+                                                onChange={(e) => handleRowChange(row.id, 'question_explanation', e.target.value)}
+                                                rows={2}
+                                                className="w-full p-1.5 border rounded text-sm resize-none"
+                                            />
+                                        </td>
+                                        <td className="p-2 align-top">
+                                            <input 
+                                                value={row.tag}
+                                                onChange={(e) => handleRowChange(row.id, 'tag', e.target.value)}
+                                                className="w-full p-1.5 border rounded text-sm"
+                                            />
+                                        </td>
+                                        <td className="p-2 align-top">
                                             <button 
                                                 onClick={() => removeRow(row.id)}
                                                 className="mt-1.5 p-1 text-muted-foreground hover:text-rose-500 hover:bg-rose-50 rounded transition-colors"
@@ -424,7 +449,7 @@ const UploadMcqQuestionAns = () => {
                                     </tr>
                                     {!row.isValid && row.errors.length > 0 && (
                                         <tr>
-                                            <td colSpan={10} className="p-2 text-rose-600 text-sm bg-rose-50/50 border-b border-rose-100">
+                                            <td colSpan={12} className="p-2 text-rose-600 text-sm bg-rose-50/50 border-b border-rose-100">
                                                 <div className="flex gap-2 font-medium">
                                                     <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
                                                     <div>

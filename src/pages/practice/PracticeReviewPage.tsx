@@ -88,6 +88,8 @@ const PracticeReviewPage: React.FC = () => {
             const userAnswerId = question.userSelectedOptionId;
             const correctOption = question.options.find(o => o.isCorrect);
             const isCorrect = userAnswerId === correctOption?.id;
+            const explanation = question.questionExplanation ?? question.question_explanation;
+            const tag = question.tag ?? question.tags;
 
             return (
               <Card key={question.id} className="border-0 shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white">
@@ -147,6 +149,26 @@ const PracticeReviewPage: React.FC = () => {
                     <div className="mt-4 p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2 text-slate-500 text-xs font-medium">
                       <AlertCircle size={14} />
                       This question was not answered.
+                    </div>
+                  )}
+
+                  {explanation && (
+                    <div className="mt-4 p-4 rounded-2xl bg-amber-50/50 border border-amber-100/50 text-slate-700 space-y-2">
+                      <div className="flex items-center gap-2 text-amber-800 font-bold text-xs uppercase tracking-wider">
+                        <Info size={14} /> Explanation
+                      </div>
+                      <p className="text-sm leading-relaxed text-slate-600">{explanation}</p>
+                    </div>
+                  )}
+
+                  {tag && (
+                    <div className="mt-3 flex flex-wrap gap-1.5 items-center">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">Tags:</span>
+                      {tag.split(',').map((t, idx) => (
+                        <Badge key={idx} variant="secondary" className="bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full text-[10px] font-semibold px-2.5 py-0.5 border-0">
+                          {t.trim()}
+                        </Badge>
+                      ))}
                     </div>
                   )}
                 </CardContent>
