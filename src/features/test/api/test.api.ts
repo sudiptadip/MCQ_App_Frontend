@@ -99,10 +99,53 @@ export const getFilteredQuestions = async (
 ): Promise<FilteredQuestionsResponse> => {
   const response = await api.post(API_ROUTES.GET_FILTERED_QUESTIONS, filters);
   if (response.data.isSuccess) {
+    const questions = (response.data?.data || []) as QuestionWithDetails[];
+    const totalCount = questions[0]?.total_count ?? 
+                       questions[0]?.question?.total_count ?? 
+                       response.data?.total ?? 
+                       questions.length;
     return {
-      data: (response.data?.data || []) as QuestionWithDetails[],
-      total: response.data?.total ?? response.data?.data?.length ?? 0,
+      data: questions,
+      total: totalCount,
     };
   }
   throw new Error(response.data.message || "Failed to fetch filtered questions");
+};
+
+// ─── Franchise Assignment ─────────────────────────────────────────────────────
+
+export interface FranchiseDropDownItem {
+  label: string;
+  value: number;
+  is_selected?: number | boolean;
+}
+
+export const getFranchiseDropDownList = async (): Promise<FranchiseDropDownItem[]> => {
+  const response = await api.post(API_ROUTES.GET_FRANCHISE_DROP_DOWN, {});
+  if (response.data.isSuccess) {
+    return (response.data?.data || []) as FranchiseDropDownItem[];
+  }
+  throw new Error(response.data.message || "Failed to fetch franchise list");
+};
+
+export const getFranchiseTestMappings = async (
+  testId: number
+): Promise<FranchiseDropDownItem[]> => {
+  const response = await api.post(API_ROUTES.GET_FRANCHISE_TEST_MAPPINGS, { test_id: testId });
+  if (response.data.isSuccess) {
+    return (response.data?.data || []) as FranchiseDropDownItem[];
+  }
+  throw new Error(response.data.message || "Failed to fetch franchise mappings");
+};
+
+export interface SaveFranchiseTestPayload {
+  test_id: number;
+  franchise_ids: number[];
+}
+
+export const saveFranchiseTest = async (
+  payload: SaveFranchiseTestPayload
+): Promise<apiResponse<number>> => {
+  const response = await api.post(API_ROUTES.SAVE_FRANCHISE_TEST, payload);
+  return response.data;
 };

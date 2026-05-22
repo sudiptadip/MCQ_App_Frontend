@@ -10,6 +10,7 @@ export interface QuestionWithDetails {
       category_name?: string;
       root_category_id?: number;
       parent_category_id?: number;
+      total_count?: number;
   };
   id?: number;
   question_text?: string;
@@ -20,6 +21,7 @@ export interface QuestionWithDetails {
   tag?: string;
   root_category_id?: number;
   parent_category_id?: number;
+  total_count?: number;
   options: QuestionOption[];
 }
 
@@ -28,10 +30,16 @@ export interface UpsertQuestionPayload {
   options: Partial<QuestionOption>[];
 }
 
-export const getQuestionAnsList = async (): Promise<QuestionWithDetails[]> => {
-  const response = await api.post(API_ROUTES.GET_QUESTION_ANS_LIST, {});
+export const getQuestionAnsList = async (params?: { 
+  pageNumber?: number; 
+  pageSize?: number; 
+  searchKeyword?: string; 
+}): Promise<{ questions: QuestionWithDetails[]; totalCount: number }> => {
+  const response = await api.post(API_ROUTES.GET_QUESTION_ANS_LIST, params || {});
   if (response.data.isSuccess) {
-    return (response.data?.data || []) as QuestionWithDetails[];
+    const list = (response.data?.data || []) as QuestionWithDetails[];
+    const totalCount = list.length > 0 ? (list[0]?.question?.total_count ?? list[0]?.total_count ?? 0) : 0;
+    return { questions: list, totalCount };
   }
   throw new Error(response.data.message || "Failed to fetch question list");
 };

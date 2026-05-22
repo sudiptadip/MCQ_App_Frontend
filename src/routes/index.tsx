@@ -17,6 +17,7 @@ import UpsertMcqQuestionAnsPage from "../pages/mcq/UpsertMcqQuestionAnsPage";
 import UploadMcqQuestionAnsPage from "../pages/mcq/UploadMcqQuestionAnsPage";
 import TestListPage from "../pages/test/TestListPage";
 import UpsertTestPage from "../pages/test/UpsertTestPage";
+import TestDetailsPage from "../pages/test/TestDetailsPage";
 import DisplayViewListPage from "../pages/display-view/DisplayViewListPage";
 import UpsertDisplayViewPage from "../pages/display-view/UpsertDisplayViewPage";
 import PracticeHomePage from "../pages/practice/PracticeHomePage";
@@ -121,6 +122,10 @@ export const router = createBrowserRouter([
                             {
                                 path: "edit/:id",
                                 element: <UpsertTestPage />
+                            },
+                            {
+                                path: "details/:id",
+                                element: <TestDetailsPage />
                             }
                         ]
                     },

@@ -21,7 +21,7 @@ import QuestionFilterBar from "../../features/test/components/QuestionFilterBar"
 import QuestionPickerTable, { SelectionCountBadge } from "../../features/test/components/QuestionPickerTable";
 import TestQuestionsSummary from "../../features/test/components/TestQuestionsSummary";
 
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 20;
 
 const UpsertTestPage = () => {
   const navigate = useNavigate();

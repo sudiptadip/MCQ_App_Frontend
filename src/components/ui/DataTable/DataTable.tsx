@@ -42,12 +42,28 @@ export function DataTable<TData>({
   initialSorting = [],
   initialColumnFilters = [],
   initialColumnVisibility = {},
+  manualPagination = false,
+  totalRows,
+  paginationState,
+  onPaginationChange,
+  onSearchChange,
 }: DataTableProps<TData>) {
   // ── State ──────────────────────────────────────────────────────────────────
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(initialColumnFilters);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(initialColumnVisibility);
   const [globalFilter, setGlobalFilter] = React.useState("");
+
+  // Notify parent on search keyword change
+  React.useEffect(() => {
+    if (onSearchChange) {
+      onSearchChange(globalFilter);
+    }
+  }, [globalFilter, onSearchChange]);
+
+  const computedPageCount = manualPagination && totalRows !== undefined
+    ? Math.ceil(totalRows / (paginationState?.pageSize ?? defaultPageSize))
+    : undefined;
 
   // ── Table instance ─────────────────────────────────────────────────────────
   const table = useReactTable({
@@ -58,15 +74,29 @@ export function DataTable<TData>({
       columnFilters,
       columnVisibility,
       globalFilter,
+      ...(manualPagination && paginationState ? { pagination: paginationState } : {}),
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onGlobalFilterChange: setGlobalFilter,
+    ...(manualPagination ? {
+      onPaginationChange: (updater) => {
+        if (onPaginationChange) {
+          const nextState = typeof updater === "function"
+            ? updater(paginationState ?? { pageIndex: 0, pageSize: defaultPageSize })
+            : updater;
+          onPaginationChange(nextState.pageIndex, nextState.pageSize);
+        }
+      },
+      manualPagination: true,
+      manualFiltering: true,
+      pageCount: computedPageCount,
+    } : {}),
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: enableSorting ? getSortedRowModel() : undefined,
-    getFilteredRowModel: (enableSearch || columnFilters.length > 0) ? getFilteredRowModel() : undefined,
-    getPaginationRowModel: enablePagination ? getPaginationRowModel() : undefined,
+    getFilteredRowModel: (enableSearch || columnFilters.length > 0) && !manualPagination ? getFilteredRowModel() : undefined,
+    getPaginationRowModel: enablePagination && !manualPagination ? getPaginationRowModel() : undefined,
     initialState: {
       pagination: { pageSize: defaultPageSize },
     },
@@ -74,6 +104,7 @@ export function DataTable<TData>({
 
   const rows = table.getRowModel().rows;
   const totalFilteredRows = table.getFilteredRowModel().rows.length;
+
 
   // ── Excel export ───────────────────────────────────────────────────────────
   function handleExportExcel() {
@@ -212,7 +243,7 @@ export function DataTable<TData>({
           <DataTablePagination
             table={table}
             pageSizeOptions={pageSizeOptions}
-            totalRows={totalFilteredRows}
+            totalRows={manualPagination && totalRows !== undefined ? totalRows : totalFilteredRows}
           />
         </div>
       )}

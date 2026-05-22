@@ -10,6 +10,7 @@ export interface PracticeQuestion {
   question_text: string;
   difficulty_level?: string;
   category_name?: string;
+  is_bookmarked?: boolean;
   options: PracticeOption[];
 }
 

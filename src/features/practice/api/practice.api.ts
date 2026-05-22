@@ -31,6 +31,7 @@ export const fetchTestWithQuestions = async (
     question_text: q.question_text,
     difficulty_level: q.difficulty_level,
     category_name: q.category_name,
+    is_bookmarked: !!q.is_bookmarked,
     options: (q.options || []).map((o: any) => ({
       id: o.id,
       option_text: o.option_text,
@@ -81,3 +82,13 @@ export const fetchAttemptReview = async (attemptId: number): Promise<apiResponse
   const response = await api.post(API_ROUTES.GET_ATTEMPT_REVIEW, { attempt_id: attemptId });
   return response.data;
 };
+
+// ── Toggle Bookmark for a question ───────────────────────────────────────────
+// Backend SP: SpTest/6
+export const toggleBookmark = async (
+  questionId: number,
+): Promise<apiResponse<any>> => {
+  const response = await api.post(API_ROUTES.TOGGLE_BOOKMARK, { question_id: questionId });
+  return response.data;
+};
+

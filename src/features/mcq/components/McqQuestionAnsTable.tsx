@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
@@ -153,15 +154,37 @@ const McqQuestionAnsTable = () => {
         },
     ];
 
+    const [pageIndex, setPageIndex] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+    const [searchKeyword, setSearchKeyword] = useState('');
+    const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState('');
+
+    // Debounce search keyword changes to avoid excessive API requests
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchKeyword(searchKeyword);
+            setPageIndex(0); // Reset to first page when search query changes
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchKeyword]);
+
     const {
-        data: questions = [],
+        data,
         isLoading,
         isError,
         refetch
     } = useQuery({
-        queryKey: ['questions'],
-        queryFn: getQuestionAnsList
+        queryKey: ['questions', pageIndex + 1, pageSize, debouncedSearchKeyword],
+        queryFn: () => getQuestionAnsList({
+            pageNumber: pageIndex + 1,
+            pageSize,
+            searchKeyword: debouncedSearchKeyword
+        })
     });
+
+    const questions = data?.questions ?? [];
+    const totalCount = data?.totalCount ?? 0;
 
     if (isError) {
         return (
@@ -188,6 +211,16 @@ const McqQuestionAnsTable = () => {
                 searchPlaceholder="Search questions..."
                 enablePagination
                 defaultPageSize={10}
+                manualPagination={true}
+                totalRows={totalCount}
+                paginationState={{ pageIndex, pageSize }}
+                onPaginationChange={(page, size) => {
+                    setPageIndex(page);
+                    setPageSize(size);
+                }}
+                onSearchChange={(val) => {
+                    setSearchKeyword(val);
+                }}
                 onRowClick={(row: any) => {
                     const id = row?.original?.question?.id ?? row?.original?.id;
                     if (id) {

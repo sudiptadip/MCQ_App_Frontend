@@ -45,4 +45,15 @@ export interface DataTableProps<TData> {
   initialColumnFilters?: ColumnFiltersState;
   /** Initial column visibility state */
   initialColumnVisibility?: VisibilityState;
+  /** Whether pagination and filtering are handled server-side */
+  manualPagination?: boolean;
+  /** Total row count on the server (required if manualPagination is true) */
+  totalRows?: number;
+  /** Current controlled pagination state: { pageIndex, pageSize } */
+  paginationState?: { pageIndex: number; pageSize: number };
+  /** Callback fired when page index or page size changes */
+  onPaginationChange?: (pageIndex: number, pageSize: number) => void;
+  /** Callback fired when search term changes */
+  onSearchChange?: (searchValue: string) => void;
 }
+

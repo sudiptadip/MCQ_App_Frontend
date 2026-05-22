@@ -5,4 +5,5 @@ export default interface Tests {
     duration_minutes: number;
     description?: string;
     min_no_of_question_attempt?: string;
+    is_assigned_by_franchise?: boolean;
 }

@@ -10,9 +10,10 @@ import {
   CheckCircle2,
   Hash,
   Timer,
-  Target
+  Target,
+  Bookmark
 } from 'lucide-react';
-import { fetchTestWithQuestions, startAttempt, submitAttempt } from '../../features/practice/api/practice.api';
+import { fetchTestWithQuestions, startAttempt, submitAttempt, toggleBookmark } from '../../features/practice/api/practice.api';
 import { practiceSession } from '../../utils/practiceSession';
 import Loading from '../../components/common/Loading';
 import Error from '../../components/common/Error';
@@ -64,8 +65,10 @@ interface QuestionCardProps {
   index: number;
   isSelected: (optionId: number) => boolean;
   isFlagged: boolean;
+  isBookmarked: boolean;
   onSelectOption: (questionId: number, optionId: number) => void;
   onToggleFlag: (questionId: number) => void;
+  onToggleBookmark: (questionId: number) => void;
   onReset: (questionId: number) => void;
 }
 
@@ -74,8 +77,10 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
   index,
   isSelected,
   isFlagged,
+  isBookmarked,
   onSelectOption,
   onToggleFlag,
+  onToggleBookmark,
   onReset
 }) => (
   <Card className="border-0 shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white/50 backdrop-blur-sm flex flex-col h-full">
@@ -92,12 +97,22 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
             {question.question_text}
           </CardTitle>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onToggleBookmark(question.id)}
+            className={`rounded-full transition-all duration-300 ${isBookmarked ? 'text-amber-500 bg-amber-50/80 shadow-inner' : 'text-slate-400 hover:bg-slate-100'}`}
+            title={isBookmarked ? "Remove Bookmark" : "Bookmark Question"}
+          >
+            <Bookmark size={20} fill={isBookmarked ? "currentColor" : "none"} />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => onToggleFlag(question.id)}
             className={`rounded-full transition-all duration-300 ${isFlagged ? 'text-amber-500 bg-amber-50/80 shadow-inner' : 'text-slate-400 hover:bg-slate-100'}`}
+            title={isFlagged ? "Unflag Question" : "Flag Question"}
           >
             <Flag size={20} fill={isFlagged ? "currentColor" : "none"} />
           </Button>
@@ -221,6 +236,7 @@ const PracticeTestPage: React.FC = () => {
   const [session, setSession] = useState<SessionType | null>(null);
   const [localAnswers, setLocalAnswers] = useState<Record<number, number>>({});
   const [flaggedQuestions, setFlaggedQuestions] = useState<number[]>([]);
+  const [bookmarkedQuestions, setBookmarkedQuestions] = useState<number[]>([]);
 
   // ── Data Fetching ──────────────────────────────────────────────────────────
   const { data: testData, isLoading, isError } = useQuery({
@@ -229,6 +245,15 @@ const PracticeTestPage: React.FC = () => {
     enabled: !!testIdNum,
   });
 
+  // ── Bookmark Initialization ────────────────────────────────────────────────
+  useEffect(() => {
+    if (testData?.questions) {
+      const initialBookmarks = testData.questions
+        .filter(q => q.is_bookmarked)
+        .map(q => q.id);
+      setBookmarkedQuestions(initialBookmarks);
+    }
+  }, [testData]);
 
   // ── Session Initialization ──────────────────────────────────────────────────
   useEffect(() => {
@@ -294,6 +319,37 @@ const PracticeTestPage: React.FC = () => {
     onError: (err) => showToast.apiErrorShow(err)
   });
 
+  const toggleBookmarkMutation = useMutation({
+    mutationFn: toggleBookmark,
+    onMutate: async (qId) => {
+      // Optimistic update
+      setBookmarkedQuestions(prev => {
+        const isBookmarked = prev.includes(qId);
+        return isBookmarked ? prev.filter(id => id !== qId) : [...prev, qId];
+      });
+    },
+    onSuccess: (res, qId) => {
+      if (res.isSuccess) {
+        showToast.success(res.message || 'Bookmark updated');
+      } else {
+        // Revert optimistic update on backend failure
+        setBookmarkedQuestions(prev => {
+          const isBookmarked = prev.includes(qId);
+          return isBookmarked ? prev.filter(id => id !== qId) : [...prev, qId];
+        });
+        showToast.error(res.message || 'Failed to toggle bookmark');
+      }
+    },
+    onError: (err, qId) => {
+      // Revert optimistic update on request error
+      setBookmarkedQuestions(prev => {
+        const isBookmarked = prev.includes(qId);
+        return isBookmarked ? prev.filter(id => id !== qId) : [...prev, qId];
+      });
+      showToast.apiErrorShow(err);
+    }
+  });
+
   // ── Handlers ───────────────────────────────────────────────────────────────
   const handleSelectOption = useCallback((questionId: number, optionId: number) => {
     setLocalAnswers(prev => ({ ...prev, [questionId]: optionId }));
@@ -308,6 +364,10 @@ const PracticeTestPage: React.FC = () => {
     });
     practiceSession.toggleFlag(testIdNum, questionId);
   }, [testIdNum]);
+
+  const handleToggleBookmark = useCallback((questionId: number) => {
+    toggleBookmarkMutation.mutate(questionId);
+  }, [toggleBookmarkMutation]);
 
   const handleResetAnswer = useCallback((questionId: number) => {
     setLocalAnswers(prev => {
@@ -394,8 +454,10 @@ const PracticeTestPage: React.FC = () => {
               index={currentQuestionIndex}
               isSelected={(optionId) => localAnswers[currentQuestion.id] === optionId}
               isFlagged={flaggedQuestions.includes(currentQuestion.id)}
+              isBookmarked={bookmarkedQuestions.includes(currentQuestion.id)}
               onSelectOption={handleSelectOption}
               onToggleFlag={handleToggleFlag}
+              onToggleBookmark={handleToggleBookmark}
               onReset={handleResetAnswer}
             />
           )}
