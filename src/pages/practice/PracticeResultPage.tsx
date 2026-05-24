@@ -45,10 +45,10 @@ const PracticeResultPage: React.FC = () => {
   const isPass = percentage >= 40; // Default pass mark 40%
 
   return (
-    <div className="min-h-screen bg-slate-50/50 p-4 md:p-8 lg:p-12 animate-in fade-in duration-1000">
+    <div className="min-h-screen bg-transparent p-4 md:p-8 lg:p-12 animate-in fade-in duration-1000">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Main Result Card */}
-        <Card className="border-0 shadow-2xl shadow-slate-200/60 rounded-[3rem] overflow-hidden bg-white">
+        <Card className="border-0 shadow-2xl dark:shadow-none shadow-slate-200/60 rounded-[3rem] overflow-hidden bg-card">
           <div className="grid grid-cols-1 md:grid-cols-12">
             
             {/* Left Side: Score Visualization */}
@@ -112,69 +112,69 @@ const PracticeResultPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Side: Details & Stats */}
-            <div className="md:col-span-7 p-8 md:p-12 bg-white flex flex-col justify-between">
+             {/* Right Side: Details & Stats */}
+            <div className="md:col-span-7 p-8 md:p-12 bg-card flex flex-col justify-between">
               <div className="space-y-8">
                 <div>
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
-                    <TrendingUp size={14} className="text-indigo-600" /> Performance Breakdown
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-zinc-500 mb-6 flex items-center gap-2">
+                    <TrendingUp size={14} className="text-indigo-600 dark:text-indigo-400" /> Performance Breakdown
                   </h3>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-5 rounded-3xl bg-emerald-50 border border-emerald-100/50 space-y-1">
+                    <div className="p-5 rounded-3xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100/50 dark:border-emerald-900/50 space-y-1">
                       <div className="flex items-center justify-between">
                         <CheckCircle2 size={18} className="text-emerald-500" />
-                        <span className="text-2xl font-black text-emerald-700">{result.correct_answers}</span>
+                        <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{result.correct_answers}</span>
                       </div>
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600/70">Correct</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-600/70 dark:text-emerald-400/80">Correct</p>
                     </div>
 
-                    <div className="p-5 rounded-3xl bg-rose-50 border border-rose-100/50 space-y-1">
+                    <div className="p-5 rounded-3xl bg-rose-50 dark:bg-rose-950/20 border border-rose-100/50 dark:border-rose-900/50 space-y-1">
                       <div className="flex items-center justify-between">
                         <XCircle size={18} className="text-rose-500" />
-                        <span className="text-2xl font-black text-rose-700">{result.total_questions - result.correct_answers}</span>
+                        <span className="text-2xl font-black text-rose-700 dark:text-rose-400">{result.total_questions - result.correct_answers}</span>
                       </div>
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-rose-600/70">Incorrect</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-rose-600/70 dark:text-rose-400/80">Incorrect</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                 <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/30 border border-slate-100 dark:border-zinc-800">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-slate-400 shadow-sm">
+                      <div className="h-10 w-10 rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-slate-400 dark:text-zinc-500 shadow-sm">
                         <Target size={18} />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Accuracy</p>
-                        <p className="text-sm font-bold text-slate-700">High Precision</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">Accuracy</p>
+                        <p className="text-sm font-bold text-slate-700 dark:text-zinc-300">High Precision</p>
                       </div>
                     </div>
-                    <span className="text-lg font-black text-slate-900">{percentage}%</span>
+                    <span className="text-lg font-black text-slate-900 dark:text-zinc-100">{percentage}%</span>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900/30 border border-slate-100 dark:border-zinc-800">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-slate-400 shadow-sm">
+                      <div className="h-10 w-10 rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-slate-400 dark:text-zinc-500 shadow-sm">
                         <Hash size={18} />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Score</p>
-                        <p className="text-sm font-bold text-slate-700">Points Earned</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">Total Score</p>
+                        <p className="text-sm font-bold text-slate-700 dark:text-zinc-300">Points Earned</p>
                       </div>
                     </div>
-                    <span className="text-lg font-black text-slate-900">{result.score} pts</span>
+                    <span className="text-lg font-black text-slate-900 dark:text-zinc-100">{result.score} pts</span>
                   </div>
                 </div>
               </div>
 
               {/* Summary Footer */}
-              <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-slate-400">
+              <div className="mt-8 pt-6 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between">
+                <div className="flex items-center gap-2 text-slate-400 dark:text-zinc-500">
                   <Calendar size={14} />
                   <span className="text-[10px] font-bold uppercase tracking-tight">Attempt #{result.attempt_id}</span>
                 </div>
-                <Badge className="bg-slate-900 text-white hover:bg-slate-800 rounded-full text-[10px] font-bold px-3 py-1">FINAL RESULT</Badge>
+                <Badge className="bg-slate-900 dark:bg-zinc-50 text-white dark:text-zinc-950 hover:bg-slate-800 dark:hover:bg-zinc-200 rounded-full text-[10px] font-bold px-3 py-1">FINAL RESULT</Badge>
               </div>
             </div>
           </div>
@@ -196,10 +196,10 @@ const PracticeResultPage: React.FC = () => {
               <RotateCcw size={20} /> Retake Practice
             </Button>
             
-            <Button 
+             <Button 
               variant="outline"
               onClick={() => navigate('/practice')}
-              className="w-full sm:w-auto min-w-[200px] rounded-2xl h-14 bg-white border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all hover:scale-105 active:scale-95 gap-2"
+              className="w-full sm:w-auto min-w-[200px] rounded-2xl h-14 bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300 font-bold hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95 gap-2"
             >
               <Home size={20} /> Practice Hub
             </Button>
@@ -209,7 +209,7 @@ const PracticeResultPage: React.FC = () => {
             <Button 
               variant="ghost"
               onClick={() => navigate('/')}
-              className="text-slate-400 font-bold hover:text-indigo-600 transition-colors gap-2"
+              className="text-slate-400 dark:text-zinc-500 font-bold hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors gap-2"
             >
               Back to Dashboard <ArrowRight size={18} />
             </Button>

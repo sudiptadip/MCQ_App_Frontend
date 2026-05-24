@@ -262,7 +262,7 @@ const UpsertDisplayViewPage: React.FC = () => {
               </Card>
             ) : (
               <div className="h-[450px] flex flex-col items-center justify-center border-2 border-dashed rounded-[3rem] border-primary/10 bg-gradient-to-br from-primary/5 to-indigo-500/5 text-center p-12 transition-all duration-700 hover:border-primary/20 group">
-                <div className="bg-white p-8 rounded-[2rem] mb-6 shadow-2xl shadow-primary/10 text-primary group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
+                <div className="bg-card dark:bg-zinc-900 p-8 rounded-[2rem] mb-6 shadow-2xl dark:shadow-none shadow-primary/10 text-primary group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
                   <Plus size={48} className="stroke-[3]" />
                 </div>
                 <h3 className="text-3xl font-black tracking-tight text-foreground/80 mb-3">Orchestrate Hierarchy</h3>
