@@ -12,6 +12,8 @@ import { STORAGE_KEYS } from "../constants";
 import type { User } from "../features/auth/types";
 import { useState, useEffect } from "react";
 import SidebarMenu, { navItems } from "../components/layout/SidebarMenu";
+import api from "../lib/axios";
+import { API_ROUTES } from "../constants/apiRoute";
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
@@ -39,9 +41,65 @@ const DashboardLayout = () => {
     if (isMobile) setIsSidebarOpen(false);
   }, [location.pathname, isMobile]);
 
+  const [franchiseLogo, setFranchiseLogo] = useState<string | null>(storage.get<string>(STORAGE_KEYS.FRANCHISE_LOGO));
+  const [franchiseName, setFranchiseName] = useState<string | null>(storage.get<string>(STORAGE_KEYS.FRANCHISE_NAME));
+
+  // Helper to resolve relative URL using VITE_API_URL
+  const getAbsoluteUrl = (url?: string): string => {
+    if (!url) return "";
+    if (/^(https?:|data:)/i.test(url)) {
+      return url;
+    }
+    const apiBase = (import.meta.env.VITE_API_URL || "").replace(/\/api$/, "");
+    const slash = url.startsWith("/") ? "" : "/";
+    return `${apiBase}${slash}${url}`;
+  };
+
+  useEffect(() => {
+    const fetchFranchiseBranding = async () => {
+      // Fetch only if user belongs to a franchise and we don't have stored values yet
+      if (!user?.franchiseId) return;
+      if (franchiseLogo || franchiseName) return;
+
+      try {
+        const response = await api.post(API_ROUTES.GET_FRANCHISE_LOGO_AND_NAME, {
+          FranchiseId: Number(user.franchiseId)
+        });
+
+        if (response.data && response.data.isSuccess) {
+          const resData = response.data.data;
+          let rawLogo = "";
+          let rawName = "";
+
+          if (Array.isArray(resData) && resData.length > 0) {
+            rawLogo = resData[0]?.logo_url || resData[0]?.LogoUrl || "";
+            rawName = resData[0]?.franchise_name || resData[0]?.FranchiseName || "";
+          } else if (resData) {
+            rawLogo = resData.logo_url || resData.LogoUrl || "";
+            rawName = resData.franchise_name || resData.FranchiseName || "";
+          }
+
+          if (rawLogo || rawName) {
+            const absoluteLogo = getAbsoluteUrl(rawLogo);
+            storage.set(STORAGE_KEYS.FRANCHISE_LOGO, absoluteLogo);
+            storage.set(STORAGE_KEYS.FRANCHISE_NAME, rawName);
+            setFranchiseLogo(absoluteLogo);
+            setFranchiseName(rawName);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load franchise branding", error);
+      }
+    };
+
+    fetchFranchiseBranding();
+  }, [user?.franchiseId, franchiseLogo, franchiseName]);
+
   const handleLogout = () => {
     storage.remove(STORAGE_KEYS.TOKEN);
     storage.remove(STORAGE_KEYS.USER);
+    storage.remove(STORAGE_KEYS.FRANCHISE_LOGO);
+    storage.remove(STORAGE_KEYS.FRANCHISE_NAME);
     navigate("/login");
   };
 
@@ -65,13 +123,25 @@ const DashboardLayout = () => {
         `}
       >
         <div className="h-16 flex items-center justify-between px-6 border-b shrink-0 bg-background">
-          <div className="flex items-center gap-2">
-            {!isSidebarOpen && !isMobile ? (
-              <BookOpen className="text-primary" />
+          <div className="flex items-center gap-2 min-w-0">
+            {franchiseLogo ? (
+              <img 
+                src={franchiseLogo} 
+                alt="Logo" 
+                className={`${
+                  !isSidebarOpen && !isMobile 
+                    ? "w-8 h-8 object-contain" 
+                    : "h-9 max-w-[150px] object-contain"
+                } hover:scale-105 transition-all duration-300`}
+              />
             ) : (
-              <span className="font-bold text-xl text-primary uppercase tracking-wider">
-                MCQ App
-              </span>
+              !isSidebarOpen && !isMobile ? (
+                <BookOpen className="text-primary shrink-0" />
+              ) : (
+                <span className="font-bold text-sm text-primary uppercase tracking-wider truncate">
+                  MCQ App
+                </span>
+              )
             )}
           </div>
           {isMobile && (
@@ -118,7 +188,9 @@ const DashboardLayout = () => {
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-semibold leading-none mb-1">{user?.name || "User"}</p>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">{user?.role || "Student"}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
+                {franchiseName || user?.role || "Student"}
+              </p>
             </div>
             <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 shadow-sm">
               <UserIcon size={20} />

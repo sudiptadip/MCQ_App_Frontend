@@ -9,6 +9,8 @@ export const ROLES = {
 export const STORAGE_KEYS = {
   TOKEN: "token",
   USER: "user",
+  FRANCHISE_LOGO: "franchise_logo",
+  FRANCHISE_NAME: "franchise_name",
 } as const;
 
 

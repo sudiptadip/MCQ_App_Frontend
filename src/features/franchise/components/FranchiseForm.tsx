@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { showToast } from "../../../utils/toast";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
@@ -17,6 +17,7 @@ import {
   CardTitle,
 } from "../../../components/ui/card";
 import type Franchise from "../../../types/database/Franchise";
+import { FileUpload } from "../../../components/ui/file-upload";
 
 import { registerFranchise, upsertFranchise } from "../api/franchise.api";
 
@@ -40,6 +41,15 @@ const franchiseSchema = z
     postal_code: z.string().optional().nullable(),
 
     logo_url: z.string().optional().nullable(),
+    logo_document_Id: z.number().optional().nullable(),
+    logo: z
+      .object({
+        id: z.number(),
+        url: z.string(),
+        fileName: z.string().optional(),
+      })
+      .nullable()
+      .optional(),
 
     smtp_host: z.string().optional().nullable(),
     smtp_port: z
@@ -103,6 +113,7 @@ const FranchiseForm = ({ initialData }: FranchiseFormProps) => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<FranchiseFormInput>({
     resolver: zodResolver(franchiseSchema),
@@ -122,6 +133,12 @@ const FranchiseForm = ({ initialData }: FranchiseFormProps) => {
       country: initialData?.country || "",
       postal_code: initialData?.postal_code || "",
       logo_url: initialData?.logo_url || "",
+      logo_document_Id: initialData?.logo_document_Id || null,
+      logo: initialData?.logo_url ? {
+        id: initialData.logo_document_Id || 0,
+        url: initialData.logo_url,
+        fileName: "Franchise Logo"
+      } : null,
       smtp_host: initialData?.smtp_host || "",
       smtp_port: initialData?.smtp_port ?? undefined,
       smtp_email: initialData?.smtp_email || "",
@@ -150,7 +167,7 @@ const FranchiseForm = ({ initialData }: FranchiseFormProps) => {
         state: formData.state,
         country: formData.country,
         postal_code: formData.postal_code,
-        logo_url: formData.logo_url,
+        logo_document_Id: formData.logo?.id || null,
         smtp_host: formData.smtp_host,
         smtp_port: formData.smtp_port,
         smtp_email: formData.smtp_email,
@@ -270,17 +287,20 @@ const FranchiseForm = ({ initialData }: FranchiseFormProps) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="logo_url">Logo URL</Label>
-                <Input
-                  id="logo_url"
-                  placeholder="https://example.com/logo.png"
-                  {...register("logo_url")}
+                <Label>Franchise Logo</Label>
+                <Controller
+                  name="logo"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <FileUpload
+                      value={field.value}
+                      onChange={field.onChange}
+                      accept="image/*"
+                      maxSize={5 * 1024 * 1024} // 5MB Limit
+                      error={fieldState.error?.message}
+                    />
+                  )}
                 />
-                {errors.logo_url && (
-                  <p className="text-sm text-red-500">
-                    {errors.logo_url.message}
-                  </p>
-                )}
               </div>
 
               <div className="space-y-2 md:col-span-2">

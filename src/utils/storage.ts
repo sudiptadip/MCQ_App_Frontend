@@ -5,7 +5,7 @@ export const storage = {
   get: <T>(key: string): T | null => {
     try {
       const item = window.localStorage.getItem(key);
-      if (key === "token") {
+      if (key === "token" || key === "franchise_logo" || key === "franchise_name") {
         return item ? item as T : null
       }
       return item ? (JSON.parse(item) as T) : null;

@@ -4,6 +4,7 @@ import { SP_NAME } from "./spName";
 export const API_ROUTES = {
   LOGIN: "/auth/login",
   REGISTER: "/auth/register",
+  GET_FRANCHISE_LOGO_AND_NAME: `/execute-sp/auth-all/SpUsers/2`,
 
   GET_FRANCHISE_LIST: `/${AUTH_ENDPOINT.ONLY_ADMIN}/${SP_NAME.SP_FRANCHISE}/1`,
   UPSERT_FRANCHISE_LIST: `/${AUTH_ENDPOINT.ONLY_ADMIN}/${SP_NAME.SP_FRANCHISE}/2`,

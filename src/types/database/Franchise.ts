@@ -22,6 +22,7 @@ export default interface Franchise {
 
   // Branding
   logo_url?: string | null;
+  logo_document_Id?: number | null;
 
   // SMTP Configuration
   smtp_host?: string | null;
@@ -40,4 +41,7 @@ export default interface Franchise {
 
   // Audit
   created_at?: string | null;
+
+
+  
 }

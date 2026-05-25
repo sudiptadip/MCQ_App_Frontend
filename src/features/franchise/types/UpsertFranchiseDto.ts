@@ -16,6 +16,7 @@ export interface UpsertFranchiseDto {
   country?: string | null;
   postal_code?: string | null;
   logo_url?: string | null;
+  logo_document_Id?: number | null;
   smtp_host?: string | null;
   smtp_port?: number | null;
   smtp_email?: string | null;
