@@ -14,6 +14,7 @@ import { useState, useEffect } from "react";
 import SidebarMenu, { navItems } from "../components/layout/SidebarMenu";
 import api from "../lib/axios";
 import { API_ROUTES } from "../constants/apiRoute";
+import { ThemeToggle } from "../components/common/ThemeToggle";
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
@@ -158,7 +159,7 @@ const DashboardLayout = () => {
         <div className="p-4 border-t bg-background shrink-0">
           <Button
             variant="ghost"
-            className="w-full justify-start gap-3 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
+            className="w-full justify-start gap-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl"
             onClick={handleLogout}
           >
             <LogOut size={20} />
@@ -186,6 +187,7 @@ const DashboardLayout = () => {
           </div>
 
           <div className="flex items-center gap-3 sm:gap-4">
+            <ThemeToggle />
             <div className="text-right hidden sm:block">
               <p className="text-sm font-semibold leading-none mb-1">{user?.name || "User"}</p>
               <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">

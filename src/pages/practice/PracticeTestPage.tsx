@@ -53,7 +53,7 @@ const TestTimer: React.FC<TestTimerProps> = React.memo(({ initialSeconds, onTime
   const isLowTime = timeLeft < 300;
 
   return (
-    <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full border transition-all duration-500 ${isLowTime ? 'bg-red-50 border-red-200 text-red-600 animate-pulse' : 'bg-slate-50 border-slate-200 text-slate-700'}`}>
+    <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full border transition-all duration-500 ${isLowTime ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 animate-pulse' : 'bg-slate-50 dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-700 dark:text-zinc-300'}`}>
       <Timer size={16} className={isLowTime ? 'animate-bounce' : ''} />
       <span className="text-sm font-bold tabular-nums">{formatTime(timeLeft)}</span>
     </div>
@@ -83,17 +83,17 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
   onToggleBookmark,
   onReset
 }) => (
-  <Card className="border-0 shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white/50 backdrop-blur-sm flex flex-col h-full">
-    <CardHeader className="p-4 md:p-6 border-b border-slate-100 bg-slate-50/30 shrink-0">
+  <Card className="border-0 shadow-xl dark:shadow-none shadow-slate-200/50 rounded-3xl overflow-hidden bg-card backdrop-blur-sm flex flex-col h-full">
+    <CardHeader className="p-4 md:p-6 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-900/10 shrink-0">
       <div className="flex justify-between items-start gap-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <Badge className="bg-indigo-600 text-white px-3 py-0.5 rounded-full text-[10px] font-bold tracking-tight">QUESTION {index + 1}</Badge>
             {question.difficulty_level && (
-              <Badge variant="outline" className="text-[10px] font-semibold border-slate-200 text-slate-500">{question.difficulty_level}</Badge>
+              <Badge variant="outline" className="text-[10px] font-semibold border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400">{question.difficulty_level}</Badge>
             )}
           </div>
-          <CardTitle className="text-lg md:text-xl font-bold text-slate-800 leading-tight">
+          <CardTitle className="text-lg md:text-xl font-bold text-slate-800 dark:text-zinc-100 leading-tight">
             {question.question_text}
           </CardTitle>
         </div>
@@ -102,7 +102,7 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
             variant="ghost"
             size="icon"
             onClick={() => onToggleBookmark(question.id)}
-            className={`rounded-full transition-all duration-300 ${isBookmarked ? 'text-amber-500 bg-amber-50/80 shadow-inner' : 'text-slate-400 hover:bg-slate-100'}`}
+            className={`rounded-full transition-all duration-300 ${isBookmarked ? 'text-amber-500 bg-amber-50/80 dark:bg-amber-950/30 shadow-inner' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800'}`}
             title={isBookmarked ? "Remove Bookmark" : "Bookmark Question"}
           >
             <Bookmark size={20} fill={isBookmarked ? "currentColor" : "none"} />
@@ -111,7 +111,7 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
             variant="ghost"
             size="icon"
             onClick={() => onToggleFlag(question.id)}
-            className={`rounded-full transition-all duration-300 ${isFlagged ? 'text-amber-500 bg-amber-50/80 shadow-inner' : 'text-slate-400 hover:bg-slate-100'}`}
+            className={`rounded-full transition-all duration-300 ${isFlagged ? 'text-amber-500 bg-amber-50/80 dark:bg-amber-950/30 shadow-inner' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800'}`}
             title={isFlagged ? "Unflag Question" : "Flag Question"}
           >
             <Flag size={20} fill={isFlagged ? "currentColor" : "none"} />
@@ -124,25 +124,25 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
         {question.options.map((option, idx) => {
           const selected = isSelected(option.id);
           return (
-            <button
+             <button
               key={option.id}
               onClick={() => onSelectOption(question.id, option.id)}
               className={`flex items-center gap-4 p-3 md:p-4 rounded-xl border transition-all duration-300 group text-left ${selected
-                ? 'border-indigo-600 bg-indigo-50/50 ring-1 ring-indigo-600/20'
-                : 'border-slate-100 bg-white hover:border-indigo-200 hover:bg-slate-50/50'
+                ? 'border-indigo-600 dark:border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/40 ring-1 ring-indigo-600/20 dark:ring-indigo-500/30'
+                : 'border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/40 hover:border-indigo-200 dark:hover:border-indigo-500 hover:bg-slate-50/50 dark:hover:bg-zinc-800/80 text-slate-700 dark:text-zinc-200'
                 }`}
             >
               <div className={`h-7 w-7 shrink-0 rounded-lg border flex items-center justify-center font-bold text-xs transition-all duration-300 ${selected
-                ? 'bg-indigo-600 border-indigo-600 text-white'
-                : 'border-slate-200 text-slate-400 group-hover:border-indigo-300 group-hover:text-indigo-600 bg-slate-50'
+                ? 'bg-indigo-600 dark:bg-indigo-500 border-indigo-600 dark:border-indigo-500 text-white'
+                : 'border-slate-200 dark:border-zinc-750 text-slate-400 dark:text-zinc-300 group-hover:border-indigo-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 bg-slate-50 dark:bg-zinc-700'
                 }`}>
                 {String.fromCharCode(65 + idx)}
               </div>
-              <span className={`flex-1 text-sm md:text-base font-medium transition-colors ${selected ? 'text-indigo-900 font-bold' : 'text-slate-600'}`}>
+              <span className={`flex-1 text-sm md:text-base font-medium transition-colors ${selected ? 'text-indigo-900 dark:text-indigo-200 font-bold' : 'text-slate-600 dark:text-zinc-300'}`}>
                 {option.option_text}
               </span>
               {selected && (
-                <div className="h-5 w-5 rounded-full bg-indigo-600 flex items-center justify-center animate-in zoom-in-50 duration-300">
+                <div className="h-5 w-5 rounded-full bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center animate-in zoom-in-50 duration-300">
                   <CheckCircle2 className="h-3 w-3 text-white" />
                 </div>
               )}
@@ -156,7 +156,7 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
           variant="ghost"
           size="sm"
           onClick={() => onReset(question.id)}
-          className="text-slate-400 hover:text-red-500 hover:bg-red-50 font-bold text-[10px] uppercase tracking-widest gap-2 rounded-lg"
+          className="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 font-bold text-[10px] uppercase tracking-widest gap-2 rounded-lg"
         >
           <X size={14} /> Clear Selection
         </Button>
@@ -180,9 +180,9 @@ const QuestionNavigator: React.FC<NavigatorProps> = React.memo(({
   flagged,
   onNavigate
 }) => (
-  <Card className="border-0 shadow-lg shadow-slate-200/40 rounded-3xl bg-white overflow-hidden">
-    <CardHeader className="p-5 border-b border-slate-50 bg-slate-50/50">
-      <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+  <Card className="border-0 shadow-lg dark:shadow-none shadow-slate-200/40 rounded-3xl bg-card overflow-hidden">
+    <CardHeader className="p-5 border-b border-slate-50 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/10">
+      <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 flex items-center gap-2">
         <Hash size={14} className="text-indigo-500" /> QUESTION NAVIGATOR
       </CardTitle>
     </CardHeader>
@@ -198,10 +198,10 @@ const QuestionNavigator: React.FC<NavigatorProps> = React.memo(({
               key={q.id}
               onClick={() => onNavigate(idx)}
               className={`h-9 rounded-xl font-bold text-xs transition-all duration-300 relative ${isCurrent
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 scale-105 z-10'
+                ? 'bg-indigo-600 text-white shadow-md dark:shadow-none shadow-indigo-200 scale-105 z-10'
                 : isAnswered
-                  ? 'bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100'
-                  : 'bg-slate-50 text-slate-400 border border-slate-100 hover:border-indigo-200 hover:text-indigo-600'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-950/40'
+                  : 'bg-slate-50 dark:bg-zinc-800/60 text-slate-500 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 hover:border-indigo-200 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400'
                 }`}
             >
               {idx + 1}
@@ -212,8 +212,8 @@ const QuestionNavigator: React.FC<NavigatorProps> = React.memo(({
           );
         })}
       </div>
-      <div className="mt-6 pt-4 border-t border-slate-100 space-y-2">
-        <div className="flex flex-wrap gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-tight text-slate-400">
+      <div className="mt-6 pt-4 border-t border-slate-100 dark:border-zinc-800 space-y-2">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-tight text-slate-400 dark:text-zinc-500">
           <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-full bg-indigo-600" /> Current</div>
           <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-full bg-emerald-500" /> Answered</div>
           <div className="flex items-center gap-1.5"><div className="h-2 w-2 rounded-full bg-amber-500" /> Flagged</div>
@@ -228,7 +228,6 @@ const PracticeTestPage: React.FC = () => {
   const navigate = useNavigate();
   const testIdNum = Number(testId);
 
-  // ── States ──────────────────────────────────────────────────────────────────
   // ── States ──────────────────────────────────────────────────────────────────
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [initialTimeLeft, setInitialTimeLeft] = useState<number | null>(null);
@@ -416,15 +415,15 @@ const PracticeTestPage: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6 animate-in fade-in duration-500 pb-24">
       {/* Header Info */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-3xl border border-slate-100 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card p-4 rounded-3xl border border-slate-100 dark:border-zinc-800 shadow-sm dark:shadow-none">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="rounded-full h-10 w-10 hover:bg-slate-50">
-            <ChevronLeft size={24} className="text-slate-500" />
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="rounded-full h-10 w-10 hover:bg-slate-50 dark:hover:bg-zinc-800">
+            <ChevronLeft size={24} className="text-slate-500 dark:text-zinc-400" />
           </Button>
           <div>
-            <h1 className="text-lg font-bold text-slate-900">{testData?.testName}</h1>
+            <h1 className="text-lg font-bold text-slate-900 dark:text-zinc-50">{testData?.testName}</h1>
             <div className="flex items-center gap-3 mt-0.5">
-              <Badge variant="secondary" className="bg-slate-100 text-slate-500 text-[10px] font-bold py-0 h-5">
+              <Badge variant="secondary" className="bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 text-[10px] font-bold py-0 h-5">
                 QUESTION {currentQuestionIndex + 1} OF {testData?.totalQuestions}
               </Badge>
               {initialTimeLeft !== null && (
@@ -435,13 +434,13 @@ const PracticeTestPage: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          <div className="flex-1 md:w-48 h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div className="flex-1 md:w-48 h-2 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
             <div 
               className="h-full bg-indigo-600 transition-all duration-500 rounded-full shadow-[0_0_8px_rgba(79,70,229,0.3)]" 
               style={{ width: `${progress}%` }} 
             />
           </div>
-          <span className="text-[10px] font-bold text-slate-400 tabular-nums whitespace-nowrap">{Math.round(progress)}% COMPLETE</span>
+          <span className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 tabular-nums whitespace-nowrap">{Math.round(progress)}% COMPLETE</span>
         </div>
       </div>
 
@@ -473,36 +472,36 @@ const PracticeTestPage: React.FC = () => {
             onNavigate={(idx) => setCurrentQuestionIndex(idx)}
           />
 
-          <Card className="border-0 shadow-xl shadow-indigo-100 rounded-3xl bg-gradient-to-br from-indigo-600 to-violet-700 p-6 text-white">
+          <Card className="border-0 shadow-xl shadow-indigo-100 dark:shadow-none rounded-3xl bg-gradient-to-br from-indigo-600 to-violet-700 dark:from-indigo-950/70 dark:to-violet-950/70 dark:border dark:border-indigo-500/30 p-6 text-white dark:shadow-[0_0_25px_rgba(99,102,241,0.25)]">
             <div className="flex items-center gap-4 mb-4">
-              <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <Target size={20} />
+              <div className="h-10 w-10 rounded-2xl bg-white/20 dark:bg-indigo-500/20 backdrop-blur-sm flex items-center justify-center">
+                <Target size={20} className="text-white dark:text-indigo-400" />
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">Target Goal</p>
-                <p className="text-lg font-bold">Min {testData?.minAttempt} Correct</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest opacity-70 dark:text-zinc-400">Target Goal</p>
+                <p className="text-lg font-bold dark:text-zinc-100">Min {testData?.minAttempt} Correct</p>
               </div>
             </div>
-            <Progress value={(Object.keys(localAnswers).length / (testData?.minAttempt || 1)) * 100} className="h-1.5 bg-white/10" />
+            <Progress value={(Object.keys(localAnswers).length / (testData?.minAttempt || 1)) * 100} className="h-1.5 bg-white/10 dark:bg-indigo-950" />
           </Card>
         </aside>
       </div>
 
       {/* Fixed Bottom Navigation Bar */}
-      <div className="fixed bottom-0 left-0 right-0 md:left-64 bg-white/80 backdrop-blur-xl border-t border-slate-200 p-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+      <div className="fixed bottom-0 left-0 right-0 md:left-64 bg-background/80 backdrop-blur-xl border-t border-slate-200 dark:border-zinc-800 p-4 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.4)]">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <Button
             variant="outline"
             disabled={currentQuestionIndex === 0}
             onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
-            className="rounded-xl h-12 px-6 font-bold border-slate-200 text-slate-600 hover:bg-slate-50 transition-all flex-1 md:flex-none"
+            className="rounded-xl h-12 px-6 font-bold border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all flex-1 md:flex-none"
           >
             <ChevronLeft className="mr-2" size={20} /> Previous
           </Button>
 
           <div className="hidden md:flex flex-col items-center gap-0.5">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Question</span>
-            <span className="text-sm font-bold text-slate-700">{currentQuestionIndex + 1} <span className="text-slate-300 mx-1">/</span> {testData?.totalQuestions}</span>
+            <span className="text-[10px] font-black text-slate-400 dark:text-zinc-500 uppercase tracking-widest">Question</span>
+            <span className="text-sm font-bold text-slate-700 dark:text-zinc-300">{currentQuestionIndex + 1} <span className="text-slate-300 dark:text-zinc-700 mx-1">/</span> {testData?.totalQuestions}</span>
           </div>
 
           <div className="flex items-center gap-3 flex-1 md:flex-none">

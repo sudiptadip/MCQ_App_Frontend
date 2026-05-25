@@ -25,11 +25,11 @@ const PracticeHomePage: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Header */}
-      <div className="relative mb-10 rounded-3xl overflow-hidden bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 p-8 md:p-12 shadow-2xl shadow-indigo-500/20">
+      <div className="relative mb-10 rounded-3xl overflow-hidden bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-8 md:p-12 shadow-2xl shadow-indigo-500/20 dark:shadow-none">
         <div className="absolute inset-0 opacity-10"
           style={{ backgroundImage: 'radial-gradient(circle at 20% 80%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         <div className="relative z-10 flex items-center gap-6">
-          <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-xl border border-white/30">
+          <div className="h-16 w-16 rounded-2xl bg-white/20 dark:bg-zinc-800/50 backdrop-blur-sm flex items-center justify-center shadow-xl border border-white/30 dark:border-zinc-700/50">
             <GraduationCap className="h-9 w-9 text-white" />
           </div>
           <div>
@@ -37,13 +37,13 @@ const PracticeHomePage: React.FC = () => {
               Practice Hub
             </h1>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-               <p className="text-indigo-200 text-base font-medium">
+               <p className="text-indigo-200 dark:text-zinc-300 text-base font-medium">
                 Choose a subject to begin your practice session
               </p>
               <div className="hidden sm:block h-1 w-1 rounded-full bg-indigo-300/30" />
               <button 
                 onClick={() => navigate('/practice/history')}
-                className="flex items-center gap-1.5 text-white/90 hover:text-white font-bold text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded-lg transition-all"
+                className="flex items-center gap-1.5 text-white/90 hover:text-white font-bold text-sm bg-white/10 dark:bg-zinc-800/40 hover:bg-white/20 dark:hover:bg-zinc-700/50 px-3 py-1 rounded-lg border border-white/10 dark:border-zinc-700/30 transition-all"
               >
                 <History size={16} /> View History
               </button>
@@ -74,12 +74,12 @@ const PracticeHomePage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {roots.map((root, idx) => {
             const colors = [
-              { bg: 'from-indigo-500 to-violet-600', light: 'bg-indigo-50 dark:bg-indigo-950/30', border: 'border-indigo-100 dark:border-indigo-900/50', icon: 'text-indigo-500', badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' },
-              { bg: 'from-emerald-500 to-teal-600', light: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-100 dark:border-emerald-900/50', icon: 'text-emerald-500', badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' },
-              { bg: 'from-orange-500 to-rose-500', light: 'bg-orange-50 dark:bg-orange-950/30', border: 'border-orange-100 dark:border-orange-900/50', icon: 'text-orange-500', badge: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300' },
-              { bg: 'from-sky-500 to-blue-600', light: 'bg-sky-50 dark:bg-sky-950/30', border: 'border-sky-100 dark:border-sky-900/50', icon: 'text-sky-500', badge: 'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300' },
-              { bg: 'from-pink-500 to-fuchsia-600', light: 'bg-pink-50 dark:bg-pink-950/30', border: 'border-pink-100 dark:border-pink-900/50', icon: 'text-pink-500', badge: 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300' },
-              { bg: 'from-amber-500 to-yellow-500', light: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-100 dark:border-amber-900/50', icon: 'text-amber-500', badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' },
+              { bg: 'from-indigo-500 to-violet-600', light: 'bg-indigo-50 dark:bg-indigo-950/20', border: 'border-indigo-100 dark:border-indigo-900/40', icon: 'text-indigo-500', badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300' },
+              { bg: 'from-emerald-500 to-teal-600', light: 'bg-emerald-50 dark:bg-emerald-950/20', border: 'border-emerald-100 dark:border-emerald-900/40', icon: 'text-emerald-500', badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' },
+              { bg: 'from-orange-500 to-rose-500', light: 'bg-orange-50 dark:bg-orange-950/20', border: 'border-orange-100 dark:border-orange-900/40', icon: 'text-orange-500', badge: 'bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300' },
+              { bg: 'from-sky-500 to-blue-600', light: 'bg-sky-50 dark:bg-sky-950/20', border: 'border-sky-100 dark:border-sky-900/40', icon: 'text-sky-500', badge: 'bg-sky-100 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300' },
+              { bg: 'from-pink-500 to-fuchsia-600', light: 'bg-pink-50 dark:bg-pink-950/20', border: 'border-pink-100 dark:border-pink-900/40', icon: 'text-pink-500', badge: 'bg-pink-100 text-pink-700 dark:bg-pink-950/40 dark:text-pink-300' },
+              { bg: 'from-amber-500 to-yellow-500', light: 'bg-amber-50 dark:bg-amber-950/20', border: 'border-amber-100 dark:border-amber-900/40', icon: 'text-amber-500', badge: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' },
             ];
             const color = colors[idx % colors.length];
 
