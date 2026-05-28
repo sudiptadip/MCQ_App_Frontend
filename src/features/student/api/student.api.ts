@@ -33,3 +33,12 @@ export const updateStudentDetails = async (payload: UpdateStudentDetailsDto): Pr
   const response = await api.post(API_ROUTES.UPSERT_STUDENT_DETAILS, payload);
   return response.data;
 };
+
+export const resetUserDevice = async (userId: number): Promise<apiResponse<any>> => {
+  const response = await api.post(API_ROUTES.RESET_USER_DEVICE, {
+    user_id: userId
+  });
+  return response.data;
+};
+
+
