@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Folder, ChevronRight, BookOpen, Layers, GraduationCap, History } from 'lucide-react';
-import { getDisplayViews } from '../../features/display-view/api/displayView.api';
+import { getDisplayViewsForStudent } from '../../features/display-view/api/displayView.api';
 import Loading from '../../components/common/Loading';
 import Error from '../../components/common/Error';
 
@@ -11,7 +11,7 @@ const PracticeHomePage: React.FC = () => {
 
   const { data: roots = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['practiceRoots'],
-    queryFn: getDisplayViews,
+    queryFn: getDisplayViewsForStudent,
   });
 
   if (isLoading) return <Loading message="Loading practice modules..." className="h-[500px]" />;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Users } from 'lucide-react';
 import { DataTable, type ColumnDef } from '../../components/ui/DataTable';
 import { getDisplayViews, deleteDisplayView } from '../../features/display-view/api/displayView.api';
 import { showToast } from '../../utils/toast';
@@ -13,11 +13,13 @@ import {
   DialogDescription, DialogFooter,
 } from '../../components/ui/dialog';
 import { Button } from '../../components/ui/button';
+import AssignStudentModal from '../../features/display-view/components/AssignStudentModal';
 
 const DisplayViewListPage: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [deleteId, setDeleteId] = React.useState<number | null>(null);
+  const [assignStudentNode, setAssignStudentNode] = React.useState<DisplayView | null>(null);
 
   const { data: roots = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['displayViews'],
@@ -50,13 +52,19 @@ const DisplayViewListPage: React.FC = () => {
     {
       id: '__actions__',
       header: 'Actions',
-      size: 120,
+      size: 150,
       enableSorting: false,
       enableHiding: false,
       cell: ({ row }) => {
         const id = row.original?.id;
         return (
           <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+            <ActionButton
+              title="Assign Students"
+              onClick={(e) => { e.stopPropagation(); if (row.original) setAssignStudentNode(row.original); }}
+            >
+              <Users size={14} />
+            </ActionButton>
             <ActionButton
               title="Edit"
               onClick={(e) => { e.stopPropagation(); if (id) navigate(`/display-view/edit/${id}`); }}
@@ -132,6 +140,11 @@ const DisplayViewListPage: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AssignStudentModal
+        node={assignStudentNode}
+        onClose={() => setAssignStudentNode(null)}
+      />
     </div>
   );
 };
