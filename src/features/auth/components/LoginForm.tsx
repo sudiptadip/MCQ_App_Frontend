@@ -15,6 +15,7 @@ import { storage } from "../../../utils/storage";
 import { STORAGE_KEYS } from "../../../constants";
 
 import { showToast } from "../../../utils/toast";
+import { getDeviceFingerprint } from "../../../utils/deviceFingerprint";
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -47,8 +48,15 @@ const LoginForm = () => {
   });
 
   // ✅ Submit Handler
-  const onSubmit = (data: LoginCredentials) => {
-    loginMutation.mutate(data);
+  const onSubmit = async (data: LoginCredentials) => {
+    
+    const fingerprint = await getDeviceFingerprint();
+
+    let payload = {
+      ...data,
+      deviceFingerprint: fingerprint
+    }
+    loginMutation.mutate(payload);
   };
 
   return (

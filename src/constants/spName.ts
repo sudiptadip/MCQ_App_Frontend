@@ -8,4 +8,5 @@ export const SP_NAME = {
     SP_DISPLAY_VIEW: "SpDisplayView",
     SP_DISPLAY_VIEW_TEST: "SpDisplayViewTest",
     SP_ATTEMPT: "SpAttempt",
+    SP_USERS: "SpUsers"
 };
