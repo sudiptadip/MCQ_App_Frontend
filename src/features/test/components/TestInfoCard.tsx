@@ -6,7 +6,7 @@ import type Tests from "../../../types/database/Tests";
 
 interface Props {
   data: Partial<Tests>;
-  onChange: (field: keyof Tests, value: string | number) => void;
+  onChange: (field: keyof Tests, value: any) => void;
 }
 
 const TestInfoCard = ({ data, onChange }: Props) => {
@@ -67,24 +67,43 @@ const TestInfoCard = ({ data, onChange }: Props) => {
           />
         </div>
 
-        {/* Min Attempt */}
-        <div>
-          <Label htmlFor="test-min" className="text-sm font-medium text-muted-foreground mb-1.5 block">
-            Min Questions to Attempt
-          </Label>
-          <Input
-            id="test-min"
-            type="number"
-            min={1}
-            placeholder="e.g. 15"
-            value={data.min_no_of_question_attempt || ""}
-            onChange={(e) => onChange("min_no_of_question_attempt", e.target.value)}
-            className="h-11"
-          />
+        {/* Shuffle Settings */}
+        <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4 border-border/60">
+          <div className="flex items-center gap-2.5 p-3 rounded-lg border border-border bg-muted/20 hover:bg-muted/30 transition-all">
+            <input
+              type="checkbox"
+              id="shuffle-questions"
+              className="h-4.5 w-4.5 rounded border-border text-primary focus:ring-primary cursor-pointer"
+              checked={!!data.shuffle_questions}
+              onChange={(e) => onChange("shuffle_questions", e.target.checked)}
+            />
+            <div>
+              <Label htmlFor="shuffle-questions" className="text-sm font-bold text-foreground cursor-pointer">
+                Shuffle Questions
+              </Label>
+              <p className="text-xs text-muted-foreground mt-0.5">Randomize the order of questions for each student attempt.</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 p-3 rounded-lg border border-border bg-muted/20 hover:bg-muted/30 transition-all">
+            <input
+              type="checkbox"
+              id="shuffle-options"
+              className="h-4.5 w-4.5 rounded border-border text-primary focus:ring-primary cursor-pointer"
+              checked={!!data.shuffle_options}
+              onChange={(e) => onChange("shuffle_options", e.target.checked)}
+            />
+            <div>
+              <Label htmlFor="shuffle-options" className="text-sm font-bold text-foreground cursor-pointer">
+                Shuffle Options
+              </Label>
+              <p className="text-xs text-muted-foreground mt-0.5">Randomize the order of answer choices for each question.</p>
+            </div>
+          </div>
         </div>
 
         {/* Description */}
-        <div className="sm:col-span-2">
+        <div className="sm:col-span-2 border-t pt-4 border-border/60">
           <Label htmlFor="test-desc" className="text-sm font-medium text-muted-foreground mb-1.5 block">
             Description
           </Label>

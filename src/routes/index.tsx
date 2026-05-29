@@ -11,7 +11,8 @@ import FranchiseFormPage from "../pages/franchise/FranchiseFormPage";
 import StudentList from "../pages/student/StudentList";
 import StudentFormPage from "../pages/student/StudentFormPage";
 import StudentDetailsPage from "../pages/student/StudentDetailsPage";
-import MCQCategory from "../pages/category/MCQCategory";
+import CategoryListPage from "../pages/category/CategoryListPage";
+import UpsertCategoryPage from "../pages/category/UpsertCategoryPage";
 import McqQuestionAnsListPage from "../pages/mcq/McqQuestionAnsListPage";
 import UpsertMcqQuestionAnsPage from "../pages/mcq/UpsertMcqQuestionAnsPage";
 import UploadMcqQuestionAnsPage from "../pages/mcq/UploadMcqQuestionAnsPage";
@@ -27,6 +28,7 @@ import PracticeResultPage from "../pages/practice/PracticeResultPage";
 import PracticeReviewPage from "../pages/practice/PracticeReviewPage";
 import PracticeHistoryPage from "../pages/practice/PracticeHistoryPage";
 import ComingSoonPage from "../pages/ComingSoonPage";
+import FranchiseHelpPage from "../pages/help/FranchiseHelpPage";
 import AccessDeniedPage from "../pages/AccessDeniedPage";
 import NotFoundPage from "../pages/NotFoundPage";
 
@@ -83,7 +85,15 @@ export const router = createBrowserRouter([
                         children: [
                             {
                                 index: true,
-                                element: <MCQCategory />
+                                element: <CategoryListPage />
+                            },
+                            {
+                                path: "create",
+                                element: <UpsertCategoryPage />
+                            },
+                            {
+                                path: "edit/:id",
+                                element: <UpsertCategoryPage />
                             }
                         ]
                     },
@@ -178,6 +188,10 @@ export const router = createBrowserRouter([
                     {
                         path: "settings",
                         element: <ComingSoonPage title="Settings" description="Settings and configuration options will be available here soon." />
+                    },
+                    {
+                        path: "help",
+                        element: <FranchiseHelpPage />
                     }
                 ]
             }

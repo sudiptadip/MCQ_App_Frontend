@@ -184,14 +184,14 @@ const PracticeResultPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in slide-in-from-bottom-4 duration-1000 delay-300">
             <Button 
               onClick={() => navigate(`/practice/review/${result.attempt_id}`)}
-              className="w-full sm:w-auto min-w-[200px] rounded-2xl h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-xl shadow-emerald-200 transition-all hover:scale-105 active:scale-95 gap-2"
+              className="w-full sm:w-auto min-w-[200px] rounded-2xl h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-xl shadow-emerald-500/20 dark:shadow-none transition-all hover:scale-105 active:scale-95 gap-2"
             >
               <CheckCircle2 size={20} /> Review Questions
             </Button>
 
             <Button 
               onClick={() => navigate(`/practice/test/${testId}`)}
-              className="w-full sm:w-auto min-w-[200px] rounded-2xl h-14 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xl shadow-indigo-200 transition-all hover:scale-105 active:scale-95 gap-2"
+              className="w-full sm:w-auto min-w-[200px] rounded-2xl h-14 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xl shadow-indigo-500/20 dark:shadow-none transition-all hover:scale-105 active:scale-95 gap-2"
             >
               <RotateCcw size={20} /> Retake Practice
             </Button>
@@ -199,7 +199,7 @@ const PracticeResultPage: React.FC = () => {
              <Button 
               variant="outline"
               onClick={() => navigate('/practice')}
-              className="w-full sm:w-auto min-w-[200px] rounded-2xl h-14 bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300 font-bold hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95 gap-2"
+              className="w-full sm:w-auto min-w-[200px] rounded-2xl h-14 bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300 font-bold hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95 gap-2 shadow-sm dark:shadow-none"
             >
               <Home size={20} /> Practice Hub
             </Button>

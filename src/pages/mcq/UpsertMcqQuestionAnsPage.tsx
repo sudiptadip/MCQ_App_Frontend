@@ -11,6 +11,8 @@ import { showToast } from '../../utils/toast';
 import { CategorySelectionCard } from './components/CategorySelectionCard';
 import { QuestionDetailsCard } from './components/QuestionDetailsCard';
 import { OptionsCard } from './components/OptionsCard';
+import { QuestionSettingsCard } from './components/QuestionSettingsCard';
+import { type FileUploadValue } from '../../components/ui/file-upload';
 
 interface OptionData {
     id: string;
@@ -40,6 +42,7 @@ const UpsertMcqQuestionAnsPage = () => {
     const [difficulty, setDifficulty] = useState("medium");
     const [questionExplanation, setQuestionExplanation] = useState("");
     const [tag, setTag] = useState("");
+    const [image, setImage] = useState<FileUploadValue | null>(null);
     const [options, setOptions] = useState<OptionData[]>([
         { id: '1', text: '', isCorrect: true },
         { id: '2', text: '', isCorrect: false },
@@ -76,10 +79,23 @@ const UpsertMcqQuestionAnsPage = () => {
             const qParentId = fetchedData.question?.root_category_id ?? fetchedData.root_category_id ??
                 fetchedData.question?.parent_category_id ?? fetchedData.parent_category_id ?? null;
 
+            const qImageUrl = fetchedData.question?.image_url ?? fetchedData.image_url ?? null;
+            const qImageDocId = fetchedData.question?.image_document_id ?? fetchedData.image_document_id ?? null;
+
             setQuestionText(qText);
             setDifficulty(qDiff);
             setQuestionExplanation(qExplanation);
             setTag(qTag);
+
+            if (qImageUrl) {
+                setImage({
+                    id: qImageDocId || 0,
+                    url: qImageUrl,
+                    fileName: "Question Image"
+                });
+            } else {
+                setImage(null);
+            }
 
             if (qParentId) {
                 const pId = Number(qParentId);
@@ -165,6 +181,7 @@ const UpsertMcqQuestionAnsPage = () => {
             setDifficulty("medium");
             setQuestionExplanation("");
             setTag("");
+            setImage(null);
             // Reset category selection
             setSelectedParentId(null);
             setSelectedChildId(null);
@@ -201,7 +218,8 @@ const UpsertMcqQuestionAnsPage = () => {
                 category_id: finalCategoryId,
                 difficulty_level: difficulty,
                 question_explanation: questionExplanation || null,
-                tag: tag || null
+                tag: tag || null,
+                image_document_id: image?.id || null,
             },
             options: options.map(o => {
                 const opt: any = {
@@ -224,7 +242,7 @@ const UpsertMcqQuestionAnsPage = () => {
     };
 
     return (
-        <div className="container mx-auto max-w-4xl py-8 space-y-8 animate-in fade-in zoom-in-95 duration-500">
+        <div className="container mx-auto max-w-6xl py-8 space-y-8 animate-in fade-in zoom-in-95 duration-500">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <div className="p-3 bg-primary/10 rounded-full text-primary">
@@ -251,36 +269,47 @@ const UpsertMcqQuestionAnsPage = () => {
                     <p>Loading question details...</p>
                 </div>
             ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <CategorySelectionCard
-                        parentCategories={rootCategories || []}
-                        selectedParentId={selectedParentId}
-                        onParentSelect={handleParentSelect}
-                        treeData={treeData}
-                        selectedChildId={selectedChildId}
-                        onChildSelect={handleChildSelect}
-                        isLoadingCategories={isLoadingRootCategories || isLoadingChildren}
-                    />
+                <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    {/* Left Column: Category and Settings */}
+                    <div className="lg:col-span-4 space-y-6">
+                        <CategorySelectionCard
+                            parentCategories={rootCategories || []}
+                            selectedParentId={selectedParentId}
+                            onParentSelect={handleParentSelect}
+                            treeData={treeData}
+                            selectedChildId={selectedChildId}
+                            onChildSelect={handleChildSelect}
+                            isLoadingCategories={isLoadingRootCategories || isLoadingChildren}
+                        />
+                        
+                        <QuestionSettingsCard
+                            difficulty={difficulty}
+                            setDifficulty={setDifficulty}
+                            tag={tag}
+                            setTag={setTag}
+                            image={image}
+                            setImage={setImage}
+                        />
+                    </div>
 
-                    <QuestionDetailsCard
-                        questionText={questionText}
-                        setQuestionText={setQuestionText}
-                        difficulty={difficulty}
-                        setDifficulty={setDifficulty}
-                        questionExplanation={questionExplanation}
-                        setQuestionExplanation={setQuestionExplanation}
-                        tag={tag}
-                        setTag={setTag}
-                    />
+                    {/* Right Column: Question Content and Options */}
+                    <div className="lg:col-span-8 space-y-6">
+                        <QuestionDetailsCard
+                            questionText={questionText}
+                            setQuestionText={setQuestionText}
+                            questionExplanation={questionExplanation}
+                            setQuestionExplanation={setQuestionExplanation}
+                        />
 
-                    <OptionsCard
-                        options={options}
-                        onAddOption={handleAddOption}
-                        onRemoveOption={handleRemoveOption}
-                        onOptionChange={handleOptionChange}
-                        onSetCorrectOption={handleSetCorrectOption}
-                        isSubmitting={upsertMutation.isPending}
-                    />
+                        <OptionsCard
+                            options={options}
+                            onAddOption={handleAddOption}
+                            onRemoveOption={handleRemoveOption}
+                            onOptionChange={handleOptionChange}
+                            onSetCorrectOption={handleSetCorrectOption}
+                            isSubmitting={upsertMutation.isPending}
+                        />
+                    </div>
                 </form>
             )}
         </div>

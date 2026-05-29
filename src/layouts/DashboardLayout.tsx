@@ -46,14 +46,20 @@ const DashboardLayout = () => {
   const [franchiseName, setFranchiseName] = useState<string | null>(storage.get<string>(STORAGE_KEYS.FRANCHISE_NAME));
 
   // Helper to resolve relative URL using VITE_API_URL
-  const getAbsoluteUrl = (url?: string): string => {
+  const getAbsoluteUrl = (url?: string | null): string => {
     if (!url) return "";
-    if (/^(https?:|data:)/i.test(url)) {
-      return url;
+    const cleanUrl = url.trim().replace(/\\/g, "/");
+    if (/^(https?:|data:)/i.test(cleanUrl)) {
+      return cleanUrl;
     }
-    const apiBase = (import.meta.env.VITE_API_URL || "").replace(/\/api$/, "");
-    const slash = url.startsWith("/") ? "" : "/";
-    return `${apiBase}${slash}${url}`;
+    let apiBase = (import.meta.env.VITE_API_URL || "").trim();
+    // Remove trailing /api or /api/
+    apiBase = apiBase.replace(/\/api\/?$/, "");
+    // Ensure apiBase doesn't have a trailing slash
+    apiBase = apiBase.replace(/\/$/, "");
+    // Ensure cleanUrl has a leading slash if not present
+    const slash = cleanUrl.startsWith("/") ? "" : "/";
+    return `${apiBase}${slash}${cleanUrl}`;
   };
 
   useEffect(() => {

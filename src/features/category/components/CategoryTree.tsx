@@ -10,8 +10,9 @@ interface CategoryTreeProps {
   onAdd: (parent: Category) => void;
   onEdit: (category: Category) => void;
   onDelete: (id: number) => void;
-  onAddNewCategory: () => void;
+  onAddNewCategory?: () => void;
   onMove: (dragId: number, parentId: number | null) => void;
+  disableAddRoot?: boolean;
 }
 
 type TreeNode = {
@@ -29,7 +30,8 @@ export const CategoryTree = ({
   onEdit,
   onDelete,
   onAddNewCategory,
-  onMove
+  onMove,
+  disableAddRoot = false
 }: CategoryTreeProps) => {
   const treeRef = useRef<any>(null);
 
@@ -159,10 +161,12 @@ export const CategoryTree = ({
             Drag & Drop to Reorganize
           </p>
         </div>
-        <Button size="sm" onClick={onAddNewCategory} className="h-8 gap-1.5 shadow-sm">
-          <Plus className="h-3.5 w-3.5" />
-          Add Root
-        </Button>
+        {!disableAddRoot && onAddNewCategory && (
+          <Button size="sm" onClick={onAddNewCategory} className="h-8 gap-1.5 shadow-sm">
+            <Plus className="h-3.5 w-3.5" />
+            Add Root
+          </Button>
+        )}
       </div>
 
       {/* Tree */}
@@ -171,9 +175,11 @@ export const CategoryTree = ({
           <div className="h-full flex flex-col items-center justify-center text-muted-foreground bg-accent/5 rounded-lg border-2 border-dashed border-muted m-4">
             <Layers className="h-10 w-10 mb-2 opacity-20" />
             <p className="italic text-sm mb-1">No structure defined yet.</p>
-            <Button variant="link" size="sm" onClick={onAddNewCategory}>
-              Create your first category
-            </Button>
+            {!disableAddRoot && onAddNewCategory && (
+              <Button variant="link" size="sm" onClick={onAddNewCategory}>
+                Create your first category
+              </Button>
+            )}
           </div>
         ) : (
           <Tree<TreeNode>

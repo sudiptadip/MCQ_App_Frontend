@@ -5,4 +5,6 @@ export interface Question {
     difficulty_level?: string;
     question_explanation?: string;
     tag?: string; // comma separated string 
+    image_url?: string | null;
+    image_document_id?: number | null;
 }

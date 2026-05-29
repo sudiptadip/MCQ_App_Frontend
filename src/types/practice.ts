@@ -11,6 +11,7 @@ export interface PracticeQuestion {
   difficulty_level?: string;
   category_name?: string;
   is_bookmarked?: boolean;
+  image_url?: string | null;
   options: PracticeOption[];
 }
 

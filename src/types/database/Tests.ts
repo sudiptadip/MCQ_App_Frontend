@@ -6,4 +6,6 @@ export default interface Tests {
     description?: string;
     min_no_of_question_attempt?: string;
     is_assigned_by_franchise?: boolean;
+    shuffle_questions?: boolean;
+    shuffle_options?: boolean;
 }

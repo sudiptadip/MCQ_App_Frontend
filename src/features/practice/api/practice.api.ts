@@ -32,6 +32,7 @@ export const fetchTestWithQuestions = async (
     difficulty_level: q.difficulty_level,
     category_name: q.category_name,
     is_bookmarked: !!q.is_bookmarked,
+    image_url: q.image_url || null,
     options: (q.options || []).map((o: any) => ({
       id: o.id,
       option_text: o.option_text,

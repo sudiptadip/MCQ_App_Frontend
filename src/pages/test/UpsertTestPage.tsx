@@ -35,10 +35,11 @@ const UpsertTestPage = () => {
     total_questions: 0,
     duration_minutes: 0,
     description: "",
-    min_no_of_question_attempt: "",
+    shuffle_questions: false,
+    shuffle_options: false,
   });
 
-  const handleFieldChange = (field: keyof Tests, value: string | number) => {
+  const handleFieldChange = (field: keyof Tests, value: any) => {
     setTestData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -160,7 +161,11 @@ const [childCategories, setChildCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     if (isEditMode && editData) {
-      setTestData(editData.test);
+      setTestData({
+        ...editData.test,
+        shuffle_questions: !!editData.test.shuffle_questions,
+        shuffle_options: !!editData.test.shuffle_options,
+      });
       const ids = new Set<number>((editData.question_ids as number[]) || []);
       setSelectedIds(ids);
       // Pre-populate question map from API-returned question details
@@ -190,7 +195,12 @@ const [childCategories, setChildCategories] = useState<Category[]>([]);
 
     try {
       const payload: UpsertTestPayload = {
-        ...testData,
+        name: testData.name || "",
+        total_questions: testData.total_questions || 0,
+        duration_minutes: testData.duration_minutes || 0,
+        description: testData.description,
+        shuffle_questions: !!testData.shuffle_questions,
+        shuffle_options: !!testData.shuffle_options,
         question_ids: Array.from(selectedIds),
       };
       if (isEditMode) (payload as any).id = Number(id);

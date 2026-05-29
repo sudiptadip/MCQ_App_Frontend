@@ -22,6 +22,8 @@ export interface QuestionWithDetails {
   root_category_id?: number;
   parent_category_id?: number;
   total_count?: number;
+  image_url?: string | null;
+  image_document_id?: number | null;
   options: QuestionOption[];
 }
 

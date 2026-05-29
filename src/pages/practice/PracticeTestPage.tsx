@@ -10,8 +10,8 @@ import {
   CheckCircle2,
   Hash,
   Timer,
-  Target,
-  Bookmark
+  Bookmark,
+  Maximize2
 } from 'lucide-react';
 import { fetchTestWithQuestions, startAttempt, submitAttempt, toggleBookmark } from '../../features/practice/api/practice.api';
 import { practiceSession } from '../../utils/practiceSession';
@@ -19,11 +19,27 @@ import Loading from '../../components/common/Loading';
 import Error from '../../components/common/Error';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
-import { Progress } from '../../components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../components/ui/dialog';
 import { showToast } from '../../utils/toast';
 import type { PracticeQuestion, PracticeSession as SessionType } from '../../types/practice';
+
+// Helper to resolve relative URL using VITE_API_URL
+const getAbsoluteUrl = (url?: string | null): string => {
+  if (!url) return "";
+  const cleanUrl = url.trim().replace(/\\/g, "/");
+  if (/^(https?:|data:)/i.test(cleanUrl)) {
+    return cleanUrl;
+  }
+  let apiBase = (import.meta.env.VITE_API_URL || "").trim();
+  // Remove trailing /api or /api/
+  apiBase = apiBase.replace(/\/api\/?$/, "");
+  // Ensure apiBase doesn't have a trailing slash
+  apiBase = apiBase.replace(/\/$/, "");
+  // Ensure cleanUrl has a leading slash if not present
+  const slash = cleanUrl.startsWith("/") ? "" : "/";
+  return `${apiBase}${slash}${cleanUrl}`;
+};
 
 // ── Memoized Components ──────────────────────────────────────────────────────
 
@@ -82,88 +98,149 @@ const QuestionCard: React.FC<QuestionCardProps> = React.memo(({
   onToggleFlag,
   onToggleBookmark,
   onReset
-}) => (
-  <Card className="border-0 shadow-xl dark:shadow-none shadow-slate-200/50 rounded-3xl overflow-hidden bg-card backdrop-blur-sm flex flex-col h-full">
-    <CardHeader className="p-4 md:p-6 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-900/10 shrink-0">
-      <div className="flex justify-between items-start gap-4">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Badge className="bg-indigo-600 text-white px-3 py-0.5 rounded-full text-[10px] font-bold tracking-tight">QUESTION {index + 1}</Badge>
-            {question.difficulty_level && (
-              <Badge variant="outline" className="text-[10px] font-semibold border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400">{question.difficulty_level}</Badge>
-            )}
-          </div>
-          <CardTitle className="text-lg md:text-xl font-bold text-slate-800 dark:text-zinc-100 leading-tight">
-            {question.question_text}
-          </CardTitle>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onToggleBookmark(question.id)}
-            className={`rounded-full transition-all duration-300 ${isBookmarked ? 'text-amber-500 bg-amber-50/80 dark:bg-amber-950/30 shadow-inner' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800'}`}
-            title={isBookmarked ? "Remove Bookmark" : "Bookmark Question"}
-          >
-            <Bookmark size={20} fill={isBookmarked ? "currentColor" : "none"} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onToggleFlag(question.id)}
-            className={`rounded-full transition-all duration-300 ${isFlagged ? 'text-amber-500 bg-amber-50/80 dark:bg-amber-950/30 shadow-inner' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800'}`}
-            title={isFlagged ? "Unflag Question" : "Flag Question"}
-          >
-            <Flag size={20} fill={isFlagged ? "currentColor" : "none"} />
-          </Button>
-        </div>
-      </div>
-    </CardHeader>
-    <CardContent className="p-6 md:p-8 space-y-6">
-      <div className="grid grid-cols-1 gap-3">
-        {question.options.map((option, idx) => {
-          const selected = isSelected(option.id);
-          return (
-             <button
-              key={option.id}
-              onClick={() => onSelectOption(question.id, option.id)}
-              className={`flex items-center gap-4 p-3 md:p-4 rounded-xl border transition-all duration-300 group text-left ${selected
-                ? 'border-indigo-600 dark:border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/40 ring-1 ring-indigo-600/20 dark:ring-indigo-500/30'
-                : 'border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/40 hover:border-indigo-200 dark:hover:border-indigo-500 hover:bg-slate-50/50 dark:hover:bg-zinc-800/80 text-slate-700 dark:text-zinc-200'
-                }`}
-            >
-              <div className={`h-7 w-7 shrink-0 rounded-lg border flex items-center justify-center font-bold text-xs transition-all duration-300 ${selected
-                ? 'bg-indigo-600 dark:bg-indigo-500 border-indigo-600 dark:border-indigo-500 text-white'
-                : 'border-slate-200 dark:border-zinc-750 text-slate-400 dark:text-zinc-300 group-hover:border-indigo-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 bg-slate-50 dark:bg-zinc-700'
-                }`}>
-                {String.fromCharCode(65 + idx)}
-              </div>
-              <span className={`flex-1 text-sm md:text-base font-medium transition-colors ${selected ? 'text-indigo-900 dark:text-indigo-200 font-bold' : 'text-slate-600 dark:text-zinc-300'}`}>
-                {option.option_text}
-              </span>
-              {selected && (
-                <div className="h-5 w-5 rounded-full bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center animate-in zoom-in-50 duration-300">
-                  <CheckCircle2 className="h-3 w-3 text-white" />
-                </div>
-              )}
-            </button>
-          );
-        })}
-      </div>
+}) => {
+  console.log("QuestionCard rendering question index:", index, "question text:", question.question_text);
+  console.log("Image URL from API:", question.image_url);
+  console.log("Resolved Absolute Image URL:", question.image_url ? getAbsoluteUrl(question.image_url) : "none");
 
-      <div className="flex justify-end pt-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onReset(question.id)}
-          className="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 font-bold text-[10px] uppercase tracking-widest gap-2 rounded-lg"
-        >
-          <X size={14} /> Clear Selection
-        </Button>
-      </div>
-    </CardContent>
-  </Card>
-));
+  const [isZoomed, setIsZoomed] = useState(false);
+
+  return (
+    <Card className="border-0 shadow-xl dark:shadow-none shadow-slate-200/50 rounded-3xl overflow-hidden bg-card backdrop-blur-sm flex flex-col h-full">
+      <CardHeader className="p-4 md:p-6 border-b border-slate-100 dark:border-zinc-800 bg-slate-50/30 dark:bg-zinc-900/10 shrink-0">
+        <div className="flex justify-between items-start gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Badge className="bg-indigo-600 text-white px-3 py-0.5 rounded-full text-[10px] font-bold tracking-tight">QUESTION {index + 1}</Badge>
+              {question.difficulty_level && (
+                <Badge variant="outline" className="text-[10px] font-semibold border-slate-200 dark:border-zinc-800 text-slate-500 dark:text-zinc-400">{question.difficulty_level}</Badge>
+              )}
+            </div>
+            <CardTitle className="text-lg md:text-xl font-bold text-slate-800 dark:text-zinc-100 leading-tight">
+              {question.question_text}
+            </CardTitle>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onToggleBookmark(question.id)}
+              className={`rounded-full transition-all duration-300 ${isBookmarked ? 'text-amber-500 bg-amber-50/80 dark:bg-amber-950/30 shadow-inner' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800'}`}
+              title={isBookmarked ? "Remove Bookmark" : "Bookmark Question"}
+            >
+              <Bookmark size={20} fill={isBookmarked ? "currentColor" : "none"} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onToggleFlag(question.id)}
+              className={`rounded-full transition-all duration-300 ${isFlagged ? 'text-amber-500 bg-amber-50/80 dark:bg-amber-950/30 shadow-inner' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-zinc-800'}`}
+              title={isFlagged ? "Unflag Question" : "Flag Question"}
+            >
+              <Flag size={20} fill={isFlagged ? "currentColor" : "none"} />
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="p-6 md:p-8 space-y-6">
+        {/* Optional Diagram illustration */}
+        {question.image_url && (
+          <>
+            <div className="flex justify-center mb-6">
+              <div 
+                onClick={() => setIsZoomed(true)}
+                className="relative group overflow-hidden rounded-2xl border border-slate-200 dark:border-zinc-800 bg-white p-3 shadow-sm hover:shadow-lg transition-all duration-300 max-w-full sm:max-w-md cursor-zoom-in"
+                title="Click to view larger image"
+              >
+                <img
+                  src={getAbsoluteUrl(question.image_url)}
+                  alt="Question diagram"
+                  className="max-h-[200px] w-auto object-contain rounded-lg transition-transform duration-300 group-hover:scale-[1.02]"
+                  onError={(e) => {
+                    console.error("Failed to load question image URL:", getAbsoluteUrl(question.image_url), e);
+                    (e.target as HTMLElement).parentElement?.style.setProperty('display', 'none');
+                  }}
+                />
+                <div className="absolute top-2 left-2 bg-slate-900/85 backdrop-blur-xs text-white text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md select-none">
+                  Illustration
+                </div>
+                <div className="absolute bottom-2 right-2 p-1.5 rounded-lg bg-slate-900/75 backdrop-blur-xs text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-md">
+                  <Maximize2 size={14} />
+                </div>
+              </div>
+            </div>
+
+            {/* Lightbox Dialog */}
+            <Dialog open={isZoomed} onOpenChange={setIsZoomed}>
+              <DialogContent className="max-w-4xl p-1 bg-black/95 border-0 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-md flex flex-col items-center justify-center">
+                <div className="relative w-full max-h-[85vh] flex items-center justify-center p-4">
+                  <img
+                    src={getAbsoluteUrl(question.image_url)}
+                    alt="Enlarged diagram"
+                    className="max-w-full max-h-[75vh] object-contain rounded-lg border border-zinc-800/50 bg-white p-4"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsZoomed(false)}
+                    className="absolute top-2 right-2 rounded-full h-8 w-8 bg-zinc-900/60 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                  >
+                    <X size={18} />
+                  </Button>
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-zinc-950/80 backdrop-blur-md border border-zinc-800 text-zinc-300 text-xs py-1.5 px-4 rounded-full select-none font-medium tracking-tight shadow-md whitespace-nowrap">
+                    {question.question_text || "Question Illustration"}
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </>
+        )}
+
+        <div className="grid grid-cols-1 gap-3">
+          {question.options.map((option, idx) => {
+            const selected = isSelected(option.id);
+            return (
+               <button
+                key={option.id}
+                onClick={() => onSelectOption(question.id, option.id)}
+                className={`flex items-center gap-4 p-3 md:p-4 rounded-xl border transition-all duration-300 group text-left ${selected
+                  ? 'border-indigo-600 dark:border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/40 ring-1 ring-indigo-600/20 dark:ring-indigo-500/30'
+                  : 'border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/40 hover:border-indigo-200 dark:hover:border-indigo-500 hover:bg-slate-50/50 dark:hover:bg-zinc-800/80 text-slate-700 dark:text-zinc-200'
+                  }`}
+              >
+                <div className={`h-7 w-7 shrink-0 rounded-lg border flex items-center justify-center font-bold text-xs transition-all duration-300 ${selected
+                  ? 'bg-indigo-600 dark:bg-indigo-500 border-indigo-600 dark:border-indigo-500 text-white'
+                  : 'border-slate-200 dark:border-zinc-750 text-slate-400 dark:text-zinc-300 group-hover:border-indigo-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 bg-slate-50 dark:bg-zinc-700'
+                  }`}>
+                  {String.fromCharCode(65 + idx)}
+                </div>
+                <span className={`flex-1 text-sm md:text-base font-medium transition-colors ${selected ? 'text-indigo-900 dark:text-indigo-200 font-bold' : 'text-slate-600 dark:text-zinc-300'}`}>
+                  {option.option_text}
+                </span>
+                {selected && (
+                  <div className="h-5 w-5 rounded-full bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center animate-in zoom-in-50 duration-300">
+                    <CheckCircle2 className="h-3 w-3 text-white" />
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex justify-end pt-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onReset(question.id)}
+            className="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 font-bold text-[10px] uppercase tracking-widest gap-2 rounded-lg"
+          >
+            <X size={14} /> Clear Selection
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+});
 
 interface NavigatorProps {
   questions: PracticeQuestion[];
@@ -471,19 +548,6 @@ const PracticeTestPage: React.FC = () => {
             flagged={flaggedQuestions}
             onNavigate={(idx) => setCurrentQuestionIndex(idx)}
           />
-
-          <Card className="border-0 shadow-xl shadow-indigo-100 dark:shadow-none rounded-3xl bg-gradient-to-br from-indigo-600 to-violet-700 dark:from-indigo-950/70 dark:to-violet-950/70 dark:border dark:border-indigo-500/30 p-6 text-white dark:shadow-[0_0_25px_rgba(99,102,241,0.25)]">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="h-10 w-10 rounded-2xl bg-white/20 dark:bg-indigo-500/20 backdrop-blur-sm flex items-center justify-center">
-                <Target size={20} className="text-white dark:text-indigo-400" />
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest opacity-70 dark:text-zinc-400">Target Goal</p>
-                <p className="text-lg font-bold dark:text-zinc-100">Min {testData?.minAttempt} Correct</p>
-              </div>
-            </div>
-            <Progress value={(Object.keys(localAnswers).length / (testData?.minAttempt || 1)) * 100} className="h-1.5 bg-white/10 dark:bg-indigo-950" />
-          </Card>
         </aside>
       </div>
 
