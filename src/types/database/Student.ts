@@ -1,6 +1,7 @@
 export interface Student {
     id: number;
     user_id: number;
+    ValidityDate?: string | null; // date
     gender?: string | null;
     date_of_birth?: string | null;
     mobile_no?: string | null;

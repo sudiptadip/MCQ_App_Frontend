@@ -11,6 +11,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { updateStudentDetails } from "../api/student.api";
 import { showToast } from "../../../utils/toast";
 
+const parseDbDatetime = (dbDateString?: string | null) => {
+  if (!dbDateString) return null;
+  // Replace space with T to make it standard ISO for safe cross-browser parsing
+  const isoString = dbDateString.replace(" ", "T");
+  const date = new Date(isoString);
+  if (isNaN(date.getTime())) return null;
+  return date;
+};
+
+const formatDatetimeLocal = (dateString?: string | null) => {
+  if (!dateString) return "";
+  const date = parseDbDatetime(dateString);
+  if (!date) return "";
+  
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+
 const studentDetailsSchema = z.object({
   user_id: z.number(),
   gender: z.string().optional().nullable(),
@@ -26,7 +50,9 @@ const studentDetailsSchema = z.object({
   postal_code: z.string().optional().nullable(),
   profile_image_url: z.string().optional().nullable(),
   status: z.boolean().default(true),
+  ValidityDate: z.string().optional().nullable(),
 });
+
 
 type StudentDetailsFormInput = z.input<typeof studentDetailsSchema>;
 type StudentDetailsFormOutput = z.output<typeof studentDetailsSchema>;
@@ -61,6 +87,7 @@ const StudentDetailsForm = ({ initialData, userId }: StudentDetailsFormProps) =>
       postal_code: initialData?.postal_code || "",
       profile_image_url: initialData?.profile_image_url || "",
       status: initialData?.status ?? true,
+      ValidityDate: initialData?.ValidityDate ? formatDatetimeLocal(initialData.ValidityDate) : "",
     },
   });
 
@@ -84,8 +111,41 @@ const StudentDetailsForm = ({ initialData, userId }: StudentDetailsFormProps) =>
 
   const onSubmit = (data: StudentDetailsFormInput) => {
     const parsed = studentDetailsSchema.parse(data) as StudentDetailsFormOutput;
-    updateMutation.mutate(parsed);
+    
+    let formattedValidityDate: string | null = null;
+    if (parsed.ValidityDate) {
+      const date = new Date(parsed.ValidityDate);
+      if (!isNaN(date.getTime())) {
+        let seconds = 0;
+        let milliseconds = 0;
+        if (initialData?.ValidityDate) {
+          const initialDate = parseDbDatetime(initialData.ValidityDate);
+          if (initialDate) {
+            seconds = initialDate.getSeconds();
+            milliseconds = initialDate.getMilliseconds();
+          }
+        }
+        
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const secStr = String(seconds).padStart(2, '0');
+        const msStr = String(milliseconds).padStart(3, '0');
+        
+        formattedValidityDate = `${year}-${month}-${day} ${hours}:${minutes}:${secStr}.${msStr}`;
+      }
+    }
+
+    const payload = {
+      ...parsed,
+      date_of_birth: parsed.date_of_birth || null,
+      ValidityDate: formattedValidityDate,
+    };
+    updateMutation.mutate(payload);
   };
+
 
   return (
     <Card className="max-w-4xl mx-auto mt-6">
@@ -137,6 +197,15 @@ const StudentDetailsForm = ({ initialData, userId }: StudentDetailsFormProps) =>
                   id="profile_image_url"
                   placeholder="https://example.com/image.jpg"
                   {...register("profile_image_url")}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ValidityDate">Validity Date & Time</Label>
+                <Input
+                  id="ValidityDate"
+                  type="datetime-local"
+                  {...register("ValidityDate")}
                 />
               </div>
               

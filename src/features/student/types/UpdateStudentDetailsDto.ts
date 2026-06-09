@@ -13,4 +13,6 @@ export interface UpdateStudentDetailsDto {
   postal_code?: string | null;
   profile_image_url?: string | null;
   status: boolean;
+  ValidityDate?: string | null;
 }
+

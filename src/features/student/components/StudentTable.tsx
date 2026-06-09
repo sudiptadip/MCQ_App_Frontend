@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import ActionButton from '../../franchise/components/ActionButton';
-import { Eye, Plus, Smartphone } from 'lucide-react';
+import { Eye, Plus, Smartphone, BookOpen } from 'lucide-react';
 import { DataTable, type ColumnDef } from '../../../components/ui/DataTable';
 import type { User as Student } from '../../../types/database/User';
 import { getStudents, resetUserDevice } from '../api/student.api';
+import AssignCategoryModal from './AssignCategoryModal';
 import Error from '../../../components/common/Error';
 import { showToast } from '../../../utils/toast';
 import { ConfirmDialog } from '../../../components/common/ConfirmDialog';
@@ -14,6 +15,7 @@ const StudentTable = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [resetDeviceUserId, setResetDeviceUserId] = useState<number | null>(null);
+    const [assignCategoryStudent, setAssignCategoryStudent] = useState<{ id: number; name: string } | null>(null);
 
     const resetDeviceMutation = useMutation({
         mutationFn: resetUserDevice,
@@ -89,6 +91,12 @@ const StudentTable = () => {
                     >
                         <Smartphone size={14} />
                     </ActionButton>
+                    <ActionButton 
+                        title="Assign Category" 
+                        onClick={() => setAssignCategoryStudent({ id: row.original.id, name: row.original.name })}
+                    >
+                        <BookOpen size={14} />
+                    </ActionButton>
                 </div>
             ),
         },
@@ -158,6 +166,12 @@ const StudentTable = () => {
                 cancelText="Cancel"
                 variant="danger"
                 isLoading={resetDeviceMutation.isPending}
+            />
+
+            <AssignCategoryModal
+                studentId={assignCategoryStudent?.id ?? null}
+                studentName={assignCategoryStudent?.name ?? null}
+                onClose={() => setAssignCategoryStudent(null)}
             />
         </div>
     );

@@ -2,7 +2,6 @@ import api from "../../../lib/axios";
 import { API_ROUTES } from "../../../constants/apiRoute";
 import type DisplayView from "../../../types/database/DisplayView";
 import type apiResponse from "../../../types/apiResponse";
-import type student_assign_test from "../../../types/database/Student_assign_test";
 
 export interface DisplayViewStudent {
   student_user_id: number;

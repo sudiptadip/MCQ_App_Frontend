@@ -5,6 +5,12 @@ import type RegisterStudentDto from "../types/RegisterStudentDto";
 import type { UpdateStudentDetailsDto } from "../types/UpdateStudentDetailsDto";
 import type apiResponse from "../../../types/apiResponse";
 
+import type { Category } from "../../../types/database/Category";
+
+export interface StudentCategory extends Category {
+  is_assigned: boolean;
+}
+
 export const getStudents = async (): Promise<Student[]> => {
   const response = await api.post(API_ROUTES.GET_STUDENT_LIST, {});
   if (response.data.isSuccess) {
@@ -38,6 +44,24 @@ export const resetUserDevice = async (userId: number): Promise<apiResponse<any>>
   const response = await api.post(API_ROUTES.RESET_USER_DEVICE, {
     user_id: userId
   });
+  return response.data;
+};
+
+export const getStudentCategories = async (studentUserId: number): Promise<StudentCategory[]> => {
+  const response = await api.post(API_ROUTES.GET_STUDENT_CATEGORIES, {
+    student_user_id: studentUserId
+  });
+  if (response.data.isSuccess) {
+    return (response.data.data as StudentCategory[]) || [];
+  }
+  throw new Error(response.data.message || "Failed to fetch student categories");
+};
+
+export const toggleStudentCategory = async (payload: {
+  student_user_id: number;
+  category_id: number;
+}): Promise<apiResponse<any>> => {
+  const response = await api.post(API_ROUTES.TOGGLE_STUDENT_CATEGORY, payload);
   return response.data;
 };
 
