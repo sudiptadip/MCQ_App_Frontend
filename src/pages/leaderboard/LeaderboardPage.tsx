@@ -352,7 +352,6 @@ const LeaderboardPage: React.FC = () => {
   const p1 = data?.find((e) => e.rank === 1);
   const p2 = data?.find((e) => e.rank === 2);
   const p3 = data?.find((e) => e.rank === 3);
-  const rest = data?.filter((e) => e.rank > 3) || [];
 
   return (
     <>
@@ -487,7 +486,7 @@ const LeaderboardPage: React.FC = () => {
 
                 {/* ── FULL STANDINGS Roster ────────────────────────────────────── */}
                 <div className="space-y-4 pt-2">
-                  <div style={{ display: "flex", alignItems: "center", justifyOrigin: "center", justifyContent: "space-between", padding: "0 4px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 4px" }}>
                     <h2 className="text-base font-black text-slate-800 dark:text-zinc-50 flex items-center gap-2">
                       <TrendingUp size={18} className="text-indigo-500" />
                       Full Standings
