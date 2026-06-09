@@ -9,7 +9,8 @@ import {
   Monitor,
   GraduationCap,
   History,
-  HelpCircle
+  HelpCircle,
+  Trophy
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { ROLES, STORAGE_KEYS } from "../../constants";
@@ -28,6 +29,7 @@ export const navItems = [
   { icon: <ClipboardCheck size={20} />, label: "Tests", path: "/test", roles: [SUPER_ADMIN, FRANCHISE_ADMIN] },
   { icon: <Monitor size={20} />, label: "Display Views", path: "/display-view", roles: [SUPER_ADMIN, FRANCHISE_ADMIN] },
   { icon: <GraduationCap size={20} />, label: "Practice", path: "/practice", roles: [SUPER_ADMIN, FRANCHISE_ADMIN, STUDENT] },
+  { icon: <Trophy size={20} />, label: "Leaderboard", path: "/leaderboard", roles: [SUPER_ADMIN, FRANCHISE_ADMIN, STUDENT] },
   { icon: <History size={20} />, label: "History", path: "/practice/history", roles: [SUPER_ADMIN, FRANCHISE_ADMIN, STUDENT] },
   { icon: <HelpCircle size={20} />, label: "Help Guide", path: "/help", roles: [SUPER_ADMIN, FRANCHISE_ADMIN] },
   { icon: <Settings size={20} />, label: "Settings", path: "/settings", roles: [SUPER_ADMIN, FRANCHISE_ADMIN, STUDENT] },

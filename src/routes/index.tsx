@@ -28,6 +28,7 @@ import PracticeResultPage from "../pages/practice/PracticeResultPage";
 import PracticeReviewPage from "../pages/practice/PracticeReviewPage";
 import PracticeHistoryPage from "../pages/practice/PracticeHistoryPage";
 import ComingSoonPage from "../pages/ComingSoonPage";
+import LeaderboardPage from "../pages/leaderboard/LeaderboardPage";
 import FranchiseHelpPage from "../pages/help/FranchiseHelpPage";
 import AccessDeniedPage from "../pages/AccessDeniedPage";
 import NotFoundPage from "../pages/NotFoundPage";
@@ -184,6 +185,10 @@ export const router = createBrowserRouter([
                                 element: <PracticeHistoryPage />
                             }
                         ]
+                    },
+                    {
+                        path: "leaderboard",
+                        element: <LeaderboardPage />
                     },
                     {
                         path: "settings",

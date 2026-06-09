@@ -9,5 +9,6 @@ export const SP_NAME = {
     SP_DISPLAY_VIEW_TEST: "SpDisplayViewTest",
     SP_ATTEMPT: "SpAttempt",
     SP_USERS: "SpUsers",
-    SP_STUDENT_CATEGORIES: "SpStudentCategories"
+    SP_STUDENT_CATEGORIES: "SpStudentCategories",
+    SP_LEADERBOARD: "SpLeaderboard"
 };
